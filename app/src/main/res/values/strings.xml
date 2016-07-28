@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Location Based Reminders</string>
+    <string name="next">next</string>
+    <string-array name="tabs">
+        <item>TAB1</item>
+        <item>TAB2</item>
+        <item>TAB3</item>
+    </string-array>
 </resources>
