@@ -140,8 +140,6 @@ public class MainActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,@Nullable Bundle savedINstanceState)
         {
             View layout=inflater.inflate(R.layout.my_fragment,container,false);
-
-
              Bundle bundle=getArguments();
             if(bundle!=null)
             {
@@ -156,7 +154,6 @@ public class MainActivity extends ActionBarActivity {
                     reminderList.clear();
                     reminderList.addAll(getRecyclerViewData());
                     reminderInfoAdapter.notifyDataSetChanged();
-
                 }
             }
             return layout;
