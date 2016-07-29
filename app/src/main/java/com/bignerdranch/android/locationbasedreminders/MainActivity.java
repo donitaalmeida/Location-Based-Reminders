@@ -125,7 +125,8 @@ public class MainActivity extends ActionBarActivity {
             dbHelper=new ReminderDbAdapter(getActivity().getBaseContext());
             dbHelper.open();
             Cursor cursor = dbHelper.fetchAllReminders();
-                while(cursor.moveToNext()) {
+            if (cursor.moveToFirst()){
+                do{
                     title = cursor.getString(cursor.getColumnIndex("title"));
                     name = cursor.getString(cursor.getColumnIndex("name"));
                     address = cursor.getString(cursor.getColumnIndex("address"));
@@ -133,15 +134,15 @@ public class MainActivity extends ActionBarActivity {
                     longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
                     date = new Date(cursor.getString(cursor.getColumnIndex("date")));
                     reminderList.add(new ReminderInfo(title, name, address, latitude, longitude, date));
-                }
+                }while(cursor.moveToNext());
+            }
+            cursor.close();
             return reminderList;
         }
         @Override
         public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,@Nullable Bundle savedINstanceState)
         {
             View layout=inflater.inflate(R.layout.my_fragment,container,false);
-
-
              Bundle bundle=getArguments();
             if(bundle!=null)
             {
@@ -156,7 +157,6 @@ public class MainActivity extends ActionBarActivity {
                     reminderList.clear();
                     reminderList.addAll(getRecyclerViewData());
                     reminderInfoAdapter.notifyDataSetChanged();
-
                 }
             }
             return layout;
