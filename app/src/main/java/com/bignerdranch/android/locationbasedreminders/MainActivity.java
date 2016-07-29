@@ -125,7 +125,8 @@ public class MainActivity extends ActionBarActivity {
             dbHelper=new ReminderDbAdapter(getActivity().getBaseContext());
             dbHelper.open();
             Cursor cursor = dbHelper.fetchAllReminders();
-                while(cursor.moveToNext()) {
+            if (cursor.moveToFirst()){
+                do{
                     title = cursor.getString(cursor.getColumnIndex("title"));
                     name = cursor.getString(cursor.getColumnIndex("name"));
                     address = cursor.getString(cursor.getColumnIndex("address"));
@@ -133,7 +134,9 @@ public class MainActivity extends ActionBarActivity {
                     longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
                     date = new Date(cursor.getString(cursor.getColumnIndex("date")));
                     reminderList.add(new ReminderInfo(title, name, address, latitude, longitude, date));
-                }
+                }while(cursor.moveToNext());
+            }
+            cursor.close();
             return reminderList;
         }
         @Override
