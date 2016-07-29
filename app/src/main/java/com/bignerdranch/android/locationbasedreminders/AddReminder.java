@@ -1,5 +1,6 @@
 package com.bignerdranch.android.locationbasedreminders;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -13,10 +14,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -25,11 +28,15 @@ import java.util.Date;
 public class AddReminder extends ActionBarActivity{
     private Button mSaveButton;
     private Button mCancelButton;
-
+    Calendar myCalendar = Calendar.getInstance();
+    DatePickerDialog datePicker1;
     private EditText mTitleEditText;
+    public static String startDateString;
     private EditText mNameEditText;
     private EditText mAddressEditText;
     private EditText mDateEditText;
+    String[] fromDate;
+    public static boolean validateDateField = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +54,13 @@ public class AddReminder extends ActionBarActivity{
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 createReminder();
+                if(v.getId()==R.id.end_date_edittext)
+                {
+                    Date d =new Date();
+                    datePicker1 = new DatePickerDialog(getApplicationContext(), fromListener, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH));
+                    datePicker1.getDatePicker().setMinDate(d.getTime());//setting with today's date
+                    datePicker1.show();
+                }
             }
         });
         mCancelButton=(Button)findViewById(R.id.cancel_button);
@@ -60,6 +74,28 @@ public class AddReminder extends ActionBarActivity{
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_sub,menu);
         return true;
+    }
+    private DatePickerDialog.OnDateSetListener fromListener = new DatePickerDialog.OnDateSetListener(){
+        public void onDateSet(DatePicker view, int from_year, int from_month,
+                              int from_day) {
+            // TODO Auto-generated method stub
+            myCalendar.set(Calendar.YEAR, from_year);
+            myCalendar.set(Calendar.MONTH, from_month);
+            myCalendar.set(Calendar.DAY_OF_MONTH, from_day);
+            updateLabelStart();
+        }
+    };
+    private void updateLabelStart() {
+        //String myFormat = "MM/dd/yy"; //In which you need put here
+        //DateFormat sdf1 = new SimpleDateFormat(myFormat, Locale.US);
+        //startDateString=sdf1.format(myCalendar.getTime());
+        //Log.d("Display","Start date string is "+startDateString);
+        //fromDate=startDateString.split("/");
+        //Log.d("VIVZ","From hour is "+fromDate[0]);
+        //Log.d("VIVZ","From MINUTE is "+fromDate[1]);
+        validateDateField=true;
+       // mDateEditText.setText(sdf1.format(myCalendar.getTime()));
+       // mDateEditText.setText(myCalendar.getTime().toString());
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
