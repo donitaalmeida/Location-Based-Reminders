@@ -40,8 +40,9 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     private EditText mNameEditText;
     private EditText mAddressEditText;
     private EditText mDateEditText;
+    private String[] contactList;
     private ImageView contactsText;
-    private LinearLayout loadingSection;
+    private LinearLayout loadingSection=null;
     private String[] nameNumberArray;
     private EditText selectedContact;
     private ImageView selectedImage;
@@ -69,6 +70,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         displayImage=(ImageView) findViewById(R.id.pasteImage);
+        loadingSection=(LinearLayout)findViewById(R.id.loading);
         selectedImage=(ImageView) findViewById(R.id.capture);
         contactsText = (ImageView) findViewById(R.id.imageIcon);
         mAddressEditText = (EditText) findViewById(R.id.place_address_edittext);
@@ -135,11 +137,13 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     }
     public void displaycontacts(View view)
     {
-        String[] contactList=getData();
+        //loadingSection.setVisibility(view.VISIBLE);
+        contactList=getData();
         Bundle b=new Bundle();
         b.putStringArray("nameContact", contactList);
         Intent i=new Intent(this, DisplayContacts.class);
         i.putExtras(b);
+        //loadingSection.setVisibility(View.GONE);
         startActivity(i);
     }
     public String[] getData()

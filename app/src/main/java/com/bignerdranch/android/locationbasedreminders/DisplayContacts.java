@@ -24,6 +24,7 @@ public class DisplayContacts extends Activity implements AdapterView.OnItemClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.displaycontacts);
         l= (ListView) findViewById(R.id.contacts);
+
         Bundle b=this.getIntent().getExtras();
         String[] list=b.getStringArray("nameContact");
         Arrays.sort(list);
