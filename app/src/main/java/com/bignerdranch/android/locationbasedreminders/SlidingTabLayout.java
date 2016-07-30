@@ -224,47 +224,6 @@ public class SlidingTabLayout extends HorizontalScrollView {
         }
     }
 
-    private ArrayList<ReminderInfo> getRecyclerViewData(int position, Context context) {
-        String title, name, address;
-        float latitude, longitude;
-        Date date;
-        int id;
-        boolean status;
-        ArrayList<ReminderInfo> reminderList=new ArrayList<>();
-        ReminderDbAdapter dbHelper=new ReminderDbAdapter(context);
-        dbHelper.open();
-        Cursor cursor = dbHelper.fetchAllReminders();
-        if (cursor.moveToFirst()){
-            do{
-                status=new Boolean(cursor.getString(cursor.getColumnIndex("status")));
-                Log.d("status",status+"");
-
-                if(!status&&position==0){
-                    title = cursor.getString(cursor.getColumnIndex("title"));
-                    name = cursor.getString(cursor.getColumnIndex("name"));
-                    address = cursor.getString(cursor.getColumnIndex("address"));
-                    latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
-                    longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
-                    date = new Date(cursor.getString(cursor.getColumnIndex("date")));
-                    id=cursor.getInt(cursor.getColumnIndex("_id"));
-                    reminderList.add(new ReminderInfo(id,title, name, address, latitude, longitude, date));
-                }
-                else if(status&&position==1){
-                    title = cursor.getString(cursor.getColumnIndex("title"));
-                    name = cursor.getString(cursor.getColumnIndex("name"));
-                    address = cursor.getString(cursor.getColumnIndex("address"));
-                    latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
-                    longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
-                    date = new Date(cursor.getString(cursor.getColumnIndex("date")));
-                    id=cursor.getInt(cursor.getColumnIndex("_id"));
-                    reminderList.add(new ReminderInfo(id,title, name, address, latitude, longitude, date));
-                }
-
-            }while(cursor.moveToNext());
-        }
-        cursor.close();
-        return reminderList;
-    }
 
     public void setContentDescription(int i, String desc) {
         mContentDescriptions.put(i, desc);
