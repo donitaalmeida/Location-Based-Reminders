@@ -3,6 +3,7 @@ package com.bignerdranch.android.locationbasedreminders;
 import android.app.DatePickerDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -46,6 +47,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     private EditText selectedContact;
     private ImageView selectedImage;
     private ImageView displayImage;
+    static SharedPreferences sharedPreferences;
     private static final int CAMERA_REQUEST = 1888;
 
     String[] fromDate;
@@ -58,16 +60,8 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
-        if(getIntent().getExtras()!=null)
-        {
-            Bundle p = getIntent().getExtras();
-            String yourPrevious =p.getString("selectedcontact");
-            selectedContact=(EditText) findViewById(R.id.contacts_text);
-            selectedContact.setText(yourPrevious);
-            selectedContact.setEnabled(false);
-            selectedContact.setFocusable(false);
-        }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        sharedPreferences = getSharedPreferences("shared", MODE_PRIVATE);
         displayImage=(ImageView) findViewById(R.id.pasteImage);
         loadingSection=(LinearLayout)findViewById(R.id.loading);
         selectedImage=(ImageView) findViewById(R.id.capture);
@@ -89,6 +83,28 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                 // Perform action on click
             }
         });
+        if(getIntent().getExtras()!=null)
+        {
+            sharedPreferences = getSharedPreferences("shared", MODE_PRIVATE);
+            String title = sharedPreferences.getString("Title", null);
+            String placeAddress = sharedPreferences.getString("Place Address", null);
+            String placeName=sharedPreferences.getString("Place name",null);
+            String endDate=sharedPreferences.getString("End date",null);
+            Log.d("Display","Title is "+title);
+            Log.d("Display","Address is "+placeAddress);
+            Log.d("Display","Name is "+placeName);
+            Log.d("Display","End date is "+endDate);
+            mTitleEditText.setText(title);
+            mAddressEditText.setText(placeAddress);
+            mNameEditText.setText(placeName);
+            mDateEditText.setText(endDate);
+            Bundle p = getIntent().getExtras();
+            String yourPrevious =p.getString("selectedcontact");
+            selectedContact=(EditText) findViewById(R.id.contacts_text);
+            selectedContact.setText(yourPrevious);
+            selectedContact.setEnabled(false);
+            selectedContact.setFocusable(false);
+        }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -134,10 +150,27 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
        }
         return super.onOptionsItemSelected(item);
     }
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        sharedPreferences=getSharedPreferences("shared",MODE_PRIVATE);
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        editor.putString("Title",mTitleEditText.getText().toString());
+        editor.putString("Place Address",mAddressEditText.getText().toString());
+        editor.putString("Place name",mNameEditText.getText().toString());
+        editor.putString("End date",mDateEditText.getText().toString());
+        editor.commit();
+        super.onSaveInstanceState(savedInstanceState);
+        // Save UI state changes to the savedInstanceState.
+        // This bundle will be passed to onCreate if the process is
+        // killed and restarted.
+        /*savedInstanceState.putBoolean("MyBoolean", true);
+        savedInstanceState.putDouble("myDouble", 1.9);
+        savedInstanceState.putInt("MyInt", 1);
+        savedInstanceState.putString("MyString", "Welcome back to Android");*/
+    }
     public void displaycontacts(View view)
     {
         loadingSection.setVisibility(view.VISIBLE);
-
         contactList=getData();
         Bundle b=new Bundle();
         b.putStringArray("nameContact", contactList);

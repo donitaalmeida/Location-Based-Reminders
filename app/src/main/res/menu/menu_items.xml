@@ -10,10 +10,4 @@
         android:title="Settings"
         tools:ignore="AppCompatResource">
     </item>
-    <item
-        android:id="@+id/navigate"
-        android:title="@string/next"
-        android:orderInCategory="200"
-        android:icon="@drawable/red_icon"
-        app:showAsAction="always"/>
 </menu>
