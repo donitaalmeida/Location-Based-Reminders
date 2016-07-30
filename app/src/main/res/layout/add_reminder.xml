@@ -109,58 +109,40 @@
                         android:textColor="#000" />
 
                 </LinearLayout>
-
                 <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/linearLayout">
-
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:id="@+id/linearLayout">
                     <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/pasteImage"/>
-    </LinearLayout>
-    <LinearLayout
-        android:id="@+id/loading"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/loadingMessage"
-            style="?android:attr/textAppearanceSmall"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Loading..."/>
-    </LinearLayout>
-    <Button
-        android:id="@+id/save_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"/>
-    <Button
-        android:id="@+id/cancel_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Cancel"
-        android:layout_alignTop="@+id/save_button"
-        android:layout_toRightOf="@+id/save_button"
-        android:layout_toEndOf="@+id/save_button"/>
-
-                <ProgressBar
-                    android:id="@+id/downloadProgress"
-                    style="?android:attr/progressBarStyleSmall"
-                    android:indeterminate="true"
-                    android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/pasteImage"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/loading"
                     android:layout_width="match_parent"
-                    android:layout_below="@+id/linearLayout2"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                </LinearLayout>
+                <Button
+                    android:id="@+id/save_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Save"
+                    android:layout_alignParentBottom="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"/>
+                <Button
+                    android:id="@+id/cancel_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cancel"
+                    android:layout_alignTop="@+id/save_button"
+                    android:layout_toRightOf="@+id/save_button"
+                    android:layout_toEndOf="@+id/save_button"/>
+
 
                 <ImageView
                     android:id="@+id/imageIcon"
@@ -169,8 +151,8 @@
                     android:src="@drawable/contacts"
                     android:onClick="displaycontacts"
                     android:layout_below="@+id/linearLayout2"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"/>
+                    android:layout_toRightOf="@+id/linearLayout"
+                    android:layout_toEndOf="@+id/linearLayout"/>
 
                 <ImageView
                     android:id="@+id/capture"
@@ -187,7 +169,10 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/contacts_text"
                     android:layout_alignBottom="@+id/imageIcon"
-                    />
+                    android:layout_toRightOf="@+id/save_button"
+                    android:layout_toEndOf="@+id/save_button"
+                    android:layout_marginLeft="27dp"
+                    android:layout_marginStart="27dp"/>
             </RelativeLayout>
 
         </LinearLayout>

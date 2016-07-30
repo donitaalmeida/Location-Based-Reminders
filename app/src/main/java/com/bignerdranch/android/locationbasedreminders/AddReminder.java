@@ -1,6 +1,7 @@
 package com.bignerdranch.android.locationbasedreminders;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
@@ -8,15 +9,18 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -47,9 +51,11 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     private ImageView selectedImage;
     private ImageView displayImage;
     private static final int CAMERA_REQUEST = 1888;
-
+    private int counter;
+    private Handler updateBarHandler;
     String[] fromDate;
     public static boolean validateDateField = false;
+    private ProgressDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +95,10 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                 // Perform action on click
             }
         });
+        updateBarHandler =new Handler();
+
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_sub,menu);
@@ -134,49 +143,84 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
        }
         return super.onOptionsItemSelected(item);
     }
-    public void displaycontacts(View view)
-    {
-        loadingSection.setVisibility(view.VISIBLE);
+    public void displaycontacts(View view) {
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Reading contacts...");
+        pDialog.setCancelable(false);
+        pDialog.show();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
+                getData();
 
-        contactList=getData();
-        Bundle b=new Bundle();
-        b.putStringArray("nameContact", contactList);
-        Intent i=new Intent(this, DisplayContacts.class);
-        i.putExtras(b);
-        loadingSection.setVisibility(View.GONE);
-        startActivity(i);
+
+            }
+        }).start();
+
+
     }
-    public String[] getData()
-    {
-        ContentResolver resolver=getContentResolver();//is used to provide retrieval of contacts
-        Cursor cursor= resolver.query(ContactsContract.Contacts.CONTENT_URI,null,null,null,null);//provided null values because I want to retrieve all contacts
+    public void getData() {
+        ContentResolver resolver = getContentResolver();//is used to provide retrieval of contacts
+        Cursor cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);//provided null values because I want to retrieve all contacts
         nameNumberArray = new String[cursor.getCount()];
         String phoneNumber = new String();
         String email = new String();
-        int i=0;
+        int i = 0;
+        final int total=cursor.getCount();
 
+        if (cursor.getCount() > 0) {
+             while (cursor.moveToNext()) {
+                 // Update the progress message
+                 updateBarHandler.post(new Runnable() {
+                     public void run() {
+                         pDialog.setMessage("Reading contacts : " + counter++ + "/" + total);
+                     }
+                 });
+                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                Cursor phoneCursor = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
+                while (phoneCursor.moveToNext()) {
+                    phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                }
+                 phoneCursor.close();
+                Cursor emailCursor = resolver.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?", new String[]{id}, null);
+                while (emailCursor.moveToNext()) {
+                    email = emailCursor.getString(emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+                }
+                 emailCursor.close();
+                nameNumberArray[i] = name + "  " + phoneNumber;
+                i++;
+            }
+            cursor.close();
 
-        while(cursor.moveToNext()) {
-            String id=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-            String name=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-            Cursor phoneCursor=resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,ContactsContract.CommonDataKinds.Phone.CONTACT_ID+" = ?",new String[]{id},null);
-            while(phoneCursor.moveToNext()) {
-                phoneNumber=phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            }
-            Cursor emailCursor=resolver.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,null,ContactsContract.CommonDataKinds.Email.CONTACT_ID+" = ?",new String[]{id},null);
-            while(emailCursor.moveToNext()) {
-                email=emailCursor.getString(emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
-            }
-            nameNumberArray[i] = name + "  " +phoneNumber;
-            i++;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                }
+            });
+
+            // Dismiss the progressbar after 500 millisecondds
+            updateBarHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    pDialog.cancel();
+                    Bundle b = new Bundle();
+                    b.putStringArray("nameContact", nameNumberArray);
+                    Intent intent = new Intent(getApplicationContext(), DisplayContacts.class);
+                    intent.putExtras(b);
+                    loadingSection.setVisibility(View.GONE);
+                    startActivity(intent);
+                }
+            }, 500);
         }
-        cursor.close();
-        for(int j=0;j<nameNumberArray.length;j++)
-        {
-            Log.d("Display","Name and number is "+nameNumberArray[j]);
-        }
-        return nameNumberArray;
     }
+
+
+
+
+
+
     private void createReminder(){
         SQLiteDatabase db = openOrCreateDatabase("LocationBasedReminders", MODE_PRIVATE, null);
         Log.d("address",mAddressEditText.getText()+"");
