@@ -67,7 +67,6 @@ public  class MyFragment extends Fragment {
                     id=cursor.getInt(cursor.getColumnIndex("_id"));
                     reminderList.add(new ReminderInfo(id,title, name, address, latitude, longitude, date));
                 }
-
             }while(cursor.moveToNext());
         }
         cursor.close();
