@@ -4,11 +4,15 @@ package com.bignerdranch.android.locationbasedreminders;
  * Created by shikh on 7/27/2016.
  */
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Display;
@@ -20,6 +24,9 @@ import android.view.WindowManager;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
@@ -43,7 +50,6 @@ public class SlidingTabLayout extends HorizontalScrollView {
      * {@link #setCustomTabColorizer(TabColorizer)}.
      */
     public interface TabColorizer {
-
         /**
          * @return return the color of the indicator used when {@code position} is selected.
          */
@@ -54,17 +60,13 @@ public class SlidingTabLayout extends HorizontalScrollView {
     private static final int TITLE_OFFSET_DIPS = 24;
     private static final int TAB_VIEW_PADDING_DIPS = 16;
     private static final int TAB_VIEW_TEXT_SIZE_SP = 12;
-
     private int mTitleOffset;
-
     private int mTabViewLayoutId;
     private int mTabViewTextViewId;
     private boolean mDistributeEvenly;
-
     private ViewPager mViewPager;
     private SparseArray<String> mContentDescriptions = new SparseArray<String>();
     private ViewPager.OnPageChangeListener mViewPagerPageChangeListener;
-
     private final SlidingTabStrip mTabStrip;
 
     public SlidingTabLayout(Context context) {
@@ -216,7 +218,52 @@ public class SlidingTabLayout extends HorizontalScrollView {
             if (i == mViewPager.getCurrentItem()) {
                 tabView.setSelected(true);
             }
+            //TODO tabs
+
+
         }
+    }
+
+    private ArrayList<ReminderInfo> getRecyclerViewData(int position, Context context) {
+        String title, name, address;
+        float latitude, longitude;
+        Date date;
+        int id;
+        boolean status;
+        ArrayList<ReminderInfo> reminderList=new ArrayList<>();
+        ReminderDbAdapter dbHelper=new ReminderDbAdapter(context);
+        dbHelper.open();
+        Cursor cursor = dbHelper.fetchAllReminders();
+        if (cursor.moveToFirst()){
+            do{
+                status=new Boolean(cursor.getString(cursor.getColumnIndex("status")));
+                Log.d("status",status+"");
+
+                if(!status&&position==0){
+                    title = cursor.getString(cursor.getColumnIndex("title"));
+                    name = cursor.getString(cursor.getColumnIndex("name"));
+                    address = cursor.getString(cursor.getColumnIndex("address"));
+                    latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
+                    longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
+                    date = new Date(cursor.getString(cursor.getColumnIndex("date")));
+                    id=cursor.getInt(cursor.getColumnIndex("_id"));
+                    reminderList.add(new ReminderInfo(id,title, name, address, latitude, longitude, date));
+                }
+                else if(status&&position==1){
+                    title = cursor.getString(cursor.getColumnIndex("title"));
+                    name = cursor.getString(cursor.getColumnIndex("name"));
+                    address = cursor.getString(cursor.getColumnIndex("address"));
+                    latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
+                    longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
+                    date = new Date(cursor.getString(cursor.getColumnIndex("date")));
+                    id=cursor.getInt(cursor.getColumnIndex("_id"));
+                    reminderList.add(new ReminderInfo(id,title, name, address, latitude, longitude, date));
+                }
+
+            }while(cursor.moveToNext());
+        }
+        cursor.close();
+        return reminderList;
     }
 
     public void setContentDescription(int i, String desc) {
@@ -226,7 +273,6 @@ public class SlidingTabLayout extends HorizontalScrollView {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-
         if (mViewPager != null) {
             scrollToTab(mViewPager.getCurrentItem(), 0);
         }
@@ -241,12 +287,10 @@ public class SlidingTabLayout extends HorizontalScrollView {
         View selectedChild = mTabStrip.getChildAt(tabIndex);
         if (selectedChild != null) {
             int targetScrollX = selectedChild.getLeft() + positionOffset;
-
             if (tabIndex > 0 || positionOffset > 0) {
                 // If we're not at the first child and are mid-scroll, make sure we obey the offset
                 targetScrollX -= mTitleOffset;
             }
-
             scrollTo(targetScrollX, 0);
         }
     }
@@ -272,13 +316,15 @@ public class SlidingTabLayout extends HorizontalScrollView {
             if (mViewPagerPageChangeListener != null) {
                 mViewPagerPageChangeListener.onPageScrolled(position, positionOffset,
                         positionOffsetPixels);
+
+
             }
+
         }
 
         @Override
         public void onPageScrollStateChanged(int state) {
             mScrollState = state;
-
             if (mViewPagerPageChangeListener != null) {
                 mViewPagerPageChangeListener.onPageScrollStateChanged(state);
             }

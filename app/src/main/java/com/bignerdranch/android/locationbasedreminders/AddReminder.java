@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
 import java.util.Date;
 
 /**
@@ -25,7 +24,6 @@ import java.util.Date;
 public class AddReminder extends ActionBarActivity{
     private Button mSaveButton;
     private Button mCancelButton;
-
     private EditText mTitleEditText;
     private EditText mNameEditText;
     private EditText mAddressEditText;
@@ -77,6 +75,7 @@ public class AddReminder extends ActionBarActivity{
     }
     private void createReminder(){
         SQLiteDatabase db = openOrCreateDatabase("LocationBasedReminders", MODE_PRIVATE, null);
+
         Log.d("address",mAddressEditText.getText()+"");
         if(!mAddressEditText.getText().toString().equals("")&&!mTitleEditText.getText().toString().equals("")&&!mDateEditText.getText().toString().equals("")&&!mNameEditText.getText().toString().equals("")){
             db.execSQL("CREATE TABLE IF NOT EXISTS Reminder( _id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -85,7 +84,6 @@ public class AddReminder extends ActionBarActivity{
                     "'" + mAddressEditText.getText().toString() + "', '" + new Date().toString() + "','"+ 0 + "','" + 0+ "','"+false+"');");
             Toast.makeText(getApplicationContext(), "Added to visit List", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, MainActivity.class));
-
         }
         else{
             LinearLayout linearLayout=(LinearLayout)findViewById(R.id.linear_layout);

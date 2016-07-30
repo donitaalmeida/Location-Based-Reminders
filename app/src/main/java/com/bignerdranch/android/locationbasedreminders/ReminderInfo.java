@@ -7,6 +7,7 @@ import java.util.Date;
  * object for holding info of places
  */
 public class ReminderInfo implements Comparable<ReminderInfo> {
+    protected int id;
     protected String title;
     protected String name;
     protected String address;
@@ -14,8 +15,8 @@ public class ReminderInfo implements Comparable<ReminderInfo> {
     protected double longitude;
     protected Date date;
 
-
-    public ReminderInfo(String title, String name, String address, float latitude, float longitude, Date date) {
+    public ReminderInfo(int id,String title, String name, String address, float latitude, float longitude, Date date) {
+        this.id=id;
         this.title = title;
         this.name=name;
         this.address = address;
