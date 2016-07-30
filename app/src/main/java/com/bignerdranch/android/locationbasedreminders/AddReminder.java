@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -40,8 +41,12 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     private EditText mAddressEditText;
     private EditText mDateEditText;
     private ImageView contactsText;
+    private LinearLayout loadingSection;
     private String[] nameNumberArray;
     private EditText selectedContact;
+    private ImageView selectedImage;
+    private ImageView displayImage;
+    private static final int CAMERA_REQUEST = 1888;
 
     String[] fromDate;
     public static boolean validateDateField = false;
@@ -63,6 +68,8 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
             selectedContact.setFocusable(false);
         }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        displayImage=(ImageView) findViewById(R.id.pasteImage);
+        selectedImage=(ImageView) findViewById(R.id.capture);
         contactsText = (ImageView) findViewById(R.id.imageIcon);
         mAddressEditText = (EditText) findViewById(R.id.place_address_edittext);
         mTitleEditText = (EditText) findViewById(R.id.title_edittext);
@@ -87,6 +94,16 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         getMenuInflater().inflate(R.menu.menu_sub,menu);
         return true;
     }
+    public void takeImageFromCamera(View view) {
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
+             }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+               if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
+                        Bitmap mphoto = (Bitmap) data.getExtras().get("data");
+                        displayImage.setImageBitmap(mphoto);
+                    }
+           }
     private DatePickerDialog.OnDateSetListener fromListener = new DatePickerDialog.OnDateSetListener(){
         public void onDateSet(DatePicker view, int from_year, int from_month,
                               int from_day) {
@@ -161,7 +178,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
             db.execSQL("CREATE TABLE IF NOT EXISTS Reminder( _id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "title VARCHAR, name VARCHAR, address VARCHAR, date VARCHAR, latitude REAL, longitude REAL, status BOOLEAN );");
             db.execSQL("INSERT INTO Reminder(title, name, address, date, latitude, longitude, status ) VALUES('" + mTitleEditText.getText().toString() + "', '" + mNameEditText.getText().toString() + "'," +
-                    "'" + mAddressEditText.getText().toString() + "', '" + new Date().toString() + "','"+ 0 + "','" + 0+ "','"+false+"');");
+                    "'" + mAddressEditText.getText().toString() + "', '" + mDateEditText.getText().toString() + "','"+ 0 + "','" + 0+ "','"+false+"');");
             Toast.makeText(getApplicationContext(), "Added to visit List", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, MainActivity.class));
 
@@ -172,9 +189,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                     .setActionTextColor(Color.RED)
                     .show();
         }
-
     }
-
     @Override
     public void onClick(View v) {
         Date d =new Date();
