@@ -11,7 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -53,7 +55,14 @@ public  class MyFragment extends Fragment {
                     address = cursor.getString(cursor.getColumnIndex("address"));
                     latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
                     longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
-                    date = new Date(cursor.getString(cursor.getColumnIndex("date")));
+                    DateFormat formatter = new SimpleDateFormat("d-MMM-yyyy,HH:mm:ss aaa");
+                    try {
+                        date = formatter.parse((cursor.getString(cursor.getColumnIndex("date"))));
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        date=new Date();
+                    }
                     id=cursor.getInt(cursor.getColumnIndex("_id"));
                     reminderList.add(new ReminderInfo(id,title, name, address, latitude, longitude, date));
                 }
@@ -63,7 +72,13 @@ public  class MyFragment extends Fragment {
                     address = cursor.getString(cursor.getColumnIndex("address"));
                     latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
                     longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
-                    date = new Date(cursor.getString(cursor.getColumnIndex("date")));
+                    DateFormat formatter = new SimpleDateFormat("d-MMM-yyyy,HH:mm:ss aaa");
+                    try {
+                        date = formatter.parse((cursor.getString(cursor.getColumnIndex("date"))));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        date=new Date();
+                    }
                     id=cursor.getInt(cursor.getColumnIndex("_id"));
                     reminderList.add(new ReminderInfo(id,title, name, address, latitude, longitude, date));
                 }
