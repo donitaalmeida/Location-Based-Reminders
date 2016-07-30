@@ -23,7 +23,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
 import java.util.Calendar;
 import java.util.Date;
 
@@ -137,13 +136,14 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     }
     public void displaycontacts(View view)
     {
-        //loadingSection.setVisibility(view.VISIBLE);
+        loadingSection.setVisibility(view.VISIBLE);
+
         contactList=getData();
         Bundle b=new Bundle();
         b.putStringArray("nameContact", contactList);
         Intent i=new Intent(this, DisplayContacts.class);
         i.putExtras(b);
-        //loadingSection.setVisibility(View.GONE);
+        loadingSection.setVisibility(View.GONE);
         startActivity(i);
     }
     public String[] getData()
@@ -154,6 +154,8 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         String phoneNumber = new String();
         String email = new String();
         int i=0;
+
+
         while(cursor.moveToNext()) {
             String id=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
             String name=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));

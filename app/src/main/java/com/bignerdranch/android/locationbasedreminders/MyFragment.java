@@ -24,17 +24,8 @@ public  class MyFragment extends Fragment {
     private TextView textView;
     private  ReminderDbAdapter dbHelper;
     private  ArrayList<ReminderInfo> reminderList = new ArrayList<>();
-    /*  public static MyFragment getInstance(int position)
-      {
-          MyFragment myFragment=new MyFragment();
-          Bundle args=new Bundle();
-          args.putInt("position",position);
-          myFragment.setArguments(args);
-          return myFragment;
-      }*/
-    public MyFragment(){
 
-    }
+
     private ArrayList<ReminderInfo> getRecyclerViewData(int position) {
         String title, name, address;
         float latitude, longitude;
@@ -48,8 +39,10 @@ public  class MyFragment extends Fragment {
         if (cursor.moveToFirst()){
             do{
                 status=new Boolean(cursor.getString(cursor.getColumnIndex("status")));
-                Log.d("status",status+"");
-                if(!status&&position==0){
+                if(position==0){
+                    status=!status;
+                }
+                if(status){
                     title = cursor.getString(cursor.getColumnIndex("title"));
                     name = cursor.getString(cursor.getColumnIndex("name"));
                     address = cursor.getString(cursor.getColumnIndex("address"));
@@ -66,22 +59,7 @@ public  class MyFragment extends Fragment {
                     id=cursor.getInt(cursor.getColumnIndex("_id"));
                     reminderList.add(new ReminderInfo(id,title, name, address, latitude, longitude, date));
                 }
-                else if(status&&position==1){
-                    title = cursor.getString(cursor.getColumnIndex("title"));
-                    name = cursor.getString(cursor.getColumnIndex("name"));
-                    address = cursor.getString(cursor.getColumnIndex("address"));
-                    latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
-                    longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
-                    DateFormat formatter = new SimpleDateFormat("d-MMM-yyyy,HH:mm:ss aaa");
-                    try {
-                        date = formatter.parse((cursor.getString(cursor.getColumnIndex("date"))));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                        date=new Date();
-                    }
-                    id=cursor.getInt(cursor.getColumnIndex("_id"));
-                    reminderList.add(new ReminderInfo(id,title, name, address, latitude, longitude, date));
-                }
+
             }while(cursor.moveToNext());
         }
         cursor.close();
