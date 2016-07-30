@@ -14,13 +14,12 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -34,7 +33,6 @@ public class MainActivity extends ActionBarActivity {
     private static ArrayList<ReminderInfo> reminderList = new ArrayList<>();
     private static ReminderDbAdapter dbHelper;
     private SimpleCursorAdapter dataAdapter;
-
 
 
     @Override
@@ -59,13 +57,9 @@ public class MainActivity extends ActionBarActivity {
                }
            });
        }
-
-
-
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         getMenuInflater().inflate(R.menu.menu_items,menu);
         return true;
     }
@@ -94,7 +88,11 @@ public class MainActivity extends ActionBarActivity {
         /****************Code for returning fragment out of the several fragments**************************/
         @Override
         public Fragment getItem(int position) {
-            MyFragment myFragment=MyFragment.getInstance(position);
+            MyFragment myFragment=new MyFragment();
+            Bundle args=new Bundle();
+            args.putInt("position",position);
+            myFragment.setArguments(args);
+            Log.e("debug","get Item called");
             return myFragment;
         }
         public CharSequence getPageTitle(int position)
@@ -107,61 +105,7 @@ public class MainActivity extends ActionBarActivity {
             return 2;
         }
     }
-    public static class MyFragment extends Fragment{
-        private TextView textView;
-        public static MyFragment getInstance(int position)
-        {
-            MyFragment myFragment=new MyFragment();
-            Bundle args=new Bundle();
-            args.putInt("position",position);
-            myFragment.setArguments(args);
-            return myFragment;
-        }
-        private  ArrayList<ReminderInfo>  getRecyclerViewData() {
-            String title, name, address;
-            float latitude, longitude;
-            Date date;
-            ArrayList<ReminderInfo> reminderList=new ArrayList<>();
-            dbHelper=new ReminderDbAdapter(getActivity().getBaseContext());
-            dbHelper.open();
-            Cursor cursor = dbHelper.fetchAllReminders();
-            if (cursor.moveToFirst()){
-                do{
-                    title = cursor.getString(cursor.getColumnIndex("title"));
-                    name = cursor.getString(cursor.getColumnIndex("name"));
-                    address = cursor.getString(cursor.getColumnIndex("address"));
-                    latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
-                    longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
-                    date = new Date(cursor.getString(cursor.getColumnIndex("date")));
-                    reminderList.add(new ReminderInfo(title, name, address, latitude, longitude, date));
-                }while(cursor.moveToNext());
-            }
-            cursor.close();
-            return reminderList;
-        }
-        @Override
-        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,@Nullable Bundle savedINstanceState)
-        {
-            View layout=inflater.inflate(R.layout.my_fragment,container,false);
-             Bundle bundle=getArguments();
-            if(bundle!=null)
-            {
-                if(bundle.getInt("position")==0){
-                    RecyclerView recyclerView=(RecyclerView) layout.findViewById(R.id.cardList);
-                    recyclerView.setHasFixedSize(true);
-                    ReminderInfoAdapter reminderInfoAdapter=new ReminderInfoAdapter(reminderList);
-                    LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-                    llm.setOrientation(LinearLayoutManager.VERTICAL);
-                    recyclerView.setLayoutManager(llm);
-                    recyclerView.setAdapter(reminderInfoAdapter);
-                    reminderList.clear();
-                    reminderList.addAll(getRecyclerViewData());
-                    reminderInfoAdapter.notifyDataSetChanged();
-                }
-            }
-            return layout;
-        }
-    }
+
 
 
 }
