@@ -1,10 +1,13 @@
 package com.bignerdranch.android.locationbasedreminders;
 
 import android.app.DatePickerDialog;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
@@ -16,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -25,7 +29,7 @@ import java.util.Date;
 /**
  * Created by shikh on 7/27/2016.
  */
-public class AddReminder extends ActionBarActivity{
+public class AddReminder extends ActionBarActivity implements View.OnClickListener{
     private Button mSaveButton;
     private Button mCancelButton;
     Calendar myCalendar = Calendar.getInstance();
@@ -35,6 +39,10 @@ public class AddReminder extends ActionBarActivity{
     private EditText mNameEditText;
     private EditText mAddressEditText;
     private EditText mDateEditText;
+    private ImageView contactsText;
+    private String[] nameNumberArray;
+    private EditText selectedContact;
+
     String[] fromDate;
     public static boolean validateDateField = false;
 
@@ -42,28 +50,32 @@ public class AddReminder extends ActionBarActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_reminder);
-        Toolbar toolbar=(Toolbar) findViewById(R.id.app_bar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
+        if(getIntent().getExtras()!=null)
+        {
+            Bundle p = getIntent().getExtras();
+            String yourPrevious =p.getString("selectedcontact");
+            selectedContact=(EditText) findViewById(R.id.contacts_text);
+            selectedContact.setText(yourPrevious);
+            selectedContact.setEnabled(false);
+            selectedContact.setFocusable(false);
+        }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mAddressEditText=(EditText)findViewById(R.id.place_address_edittext);
-        mTitleEditText=(EditText)findViewById(R.id.title_edittext);
-        mNameEditText=(EditText)findViewById(R.id.place_name_edittext);
-        mDateEditText=(EditText)findViewById(R.id.end_date_edittext);
-        mSaveButton=(Button)findViewById(R.id.save_button);
+        contactsText = (ImageView) findViewById(R.id.imageIcon);
+        mAddressEditText = (EditText) findViewById(R.id.place_address_edittext);
+        mTitleEditText = (EditText) findViewById(R.id.title_edittext);
+        mNameEditText = (EditText) findViewById(R.id.place_name_edittext);
+        mDateEditText = (EditText) findViewById(R.id.end_date_edittext);
+        mSaveButton = (Button) findViewById(R.id.save_button);
+        mDateEditText.setOnClickListener(this);
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 createReminder();
-                if(v.getId()==R.id.end_date_edittext)
-                {
-                    Date d =new Date();
-                    datePicker1 = new DatePickerDialog(getApplicationContext(), fromListener, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH));
-                    datePicker1.getDatePicker().setMinDate(d.getTime());//setting with today's date
-                    datePicker1.show();
-                }
             }
         });
-        mCancelButton=(Button)findViewById(R.id.cancel_button);
+        mCancelButton = (Button) findViewById(R.id.cancel_button);
         mCancelButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
@@ -86,16 +98,9 @@ public class AddReminder extends ActionBarActivity{
         }
     };
     private void updateLabelStart() {
-        //String myFormat = "MM/dd/yy"; //In which you need put here
-        //DateFormat sdf1 = new SimpleDateFormat(myFormat, Locale.US);
-        //startDateString=sdf1.format(myCalendar.getTime());
-        //Log.d("Display","Start date string is "+startDateString);
-        //fromDate=startDateString.split("/");
-        //Log.d("VIVZ","From hour is "+fromDate[0]);
-        //Log.d("VIVZ","From MINUTE is "+fromDate[1]);
+
         validateDateField=true;
-       // mDateEditText.setText(sdf1.format(myCalendar.getTime()));
-       // mDateEditText.setText(myCalendar.getTime().toString());
+        mDateEditText.setText(myCalendar.getTime().toString());
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
@@ -110,6 +115,44 @@ public class AddReminder extends ActionBarActivity{
            NavUtils.navigateUpTo(this, intent);
        }
         return super.onOptionsItemSelected(item);
+    }
+    public void displaycontacts(View view)
+    {
+        String[] contactList=getData();
+        Bundle b=new Bundle();
+        b.putStringArray("nameContact", contactList);
+        Intent i=new Intent(this, DisplayContacts.class);
+        i.putExtras(b);
+        startActivity(i);
+    }
+    public String[] getData()
+    {
+        ContentResolver resolver=getContentResolver();//is used to provide retrieval of contacts
+        Cursor cursor= resolver.query(ContactsContract.Contacts.CONTENT_URI,null,null,null,null);//provided null values because I want to retrieve all contacts
+        nameNumberArray = new String[cursor.getCount()];
+        String phoneNumber = new String();
+        String email = new String();
+        int i=0;
+        while(cursor.moveToNext()) {
+            String id=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+            String name=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+            Cursor phoneCursor=resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,ContactsContract.CommonDataKinds.Phone.CONTACT_ID+" = ?",new String[]{id},null);
+            while(phoneCursor.moveToNext()) {
+                phoneNumber=phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+            }
+            Cursor emailCursor=resolver.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,null,ContactsContract.CommonDataKinds.Email.CONTACT_ID+" = ?",new String[]{id},null);
+            while(emailCursor.moveToNext()) {
+                email=emailCursor.getString(emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+            }
+            nameNumberArray[i] = name + "  " +phoneNumber;
+            i++;
+        }
+        cursor.close();
+        for(int j=0;j<nameNumberArray.length;j++)
+        {
+            Log.d("Display","Name and number is "+nameNumberArray[j]);
+        }
+        return nameNumberArray;
     }
     private void createReminder(){
         SQLiteDatabase db = openOrCreateDatabase("LocationBasedReminders", MODE_PRIVATE, null);
@@ -130,5 +173,13 @@ public class AddReminder extends ActionBarActivity{
                     .show();
         }
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        Date d =new Date();
+        datePicker1 = new DatePickerDialog(this, fromListener, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH));
+        datePicker1.getDatePicker().setMinDate(d.getTime());
+        datePicker1.show();
     }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.bignerdranch.android.locationbasedreminders">
-
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,6 +20,12 @@
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
             android:value="com.bignerdranch.android.locationbasedreminders.MainActivity"/>
+        </activity>
+        <activity android:name=".DisplayContacts"
+            android:parentActivityName=".AddReminder">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.bignerdranch.android.locationbasedreminders.AddReminder"/>
         </activity>
     </application>
 
