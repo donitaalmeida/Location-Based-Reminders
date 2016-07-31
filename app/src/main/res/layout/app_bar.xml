@@ -5,5 +5,4 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#C41E3A"
     app:theme="@style/MyCustomToolBarTheme">
-
 </android.support.v7.widget.Toolbar>

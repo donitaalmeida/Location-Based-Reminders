@@ -24,8 +24,6 @@ public class MainActivity extends ActionBarActivity {
     private static ArrayList<ReminderInfo> reminderList = new ArrayList<>();
     private static ReminderDbAdapter dbHelper;
     private SimpleCursorAdapter dataAdapter;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +52,6 @@ public class MainActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_items,menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -62,10 +59,6 @@ public class MainActivity extends ActionBarActivity {
         if(id==R.id.action_settings)
         {
             return true;
-        }
-        if(id==R.id.navigate)
-        {
-            startActivity(new Intent(this, AddReminder.class));
         }
         return super.onOptionsItemSelected(item);
     }
