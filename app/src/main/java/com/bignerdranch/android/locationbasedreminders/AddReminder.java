@@ -56,6 +56,8 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     String[] fromDate;
     public static boolean validateDateField = false;
     private ProgressDialog pDialog;
+    private double lat,lng;
+    private Button mLocationButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,18 +100,39 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
             Log.d("Display","Address is "+placeAddress);
             Log.d("Display","Name is "+placeName);
             Log.d("Display","End date is "+endDate);
+
+            Bundle p = getIntent().getExtras();
+            String yourPrevious =p.getString("selectedcontact");
+            selectedContact=(EditText) findViewById(R.id.contacts_text);
+            if(yourPrevious!=null){
+
+                selectedContact.setText(yourPrevious);
+                selectedContact.setEnabled(false);
+                selectedContact.setFocusable(false);
+            }
+
+
+            if(p.getString("placeName")!=null){
+                placeName=p.getString("placeName");
+                placeAddress=p.getString("placeAddress");
+                lat=p.getDouble("lat");
+                lng=p.getDouble("lng");
+            }
             mTitleEditText.setText(title);
             mAddressEditText.setText(placeAddress);
             mNameEditText.setText(placeName);
             mDateEditText.setText(endDate);
-            Bundle p = getIntent().getExtras();
-            String yourPrevious =p.getString("selectedcontact");
-            selectedContact=(EditText) findViewById(R.id.contacts_text);
-            selectedContact.setText(yourPrevious);
-            selectedContact.setEnabled(false);
-            selectedContact.setFocusable(false);
         }
         updateBarHandler =new Handler();
+        mLocationButton=(Button)findViewById(R.id.location_button);
+        mLocationButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),MapActivity.class));
+            }
+        });
+
     }
 
     @Override
@@ -246,7 +269,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
             db.execSQL("CREATE TABLE IF NOT EXISTS Reminder( _id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "title VARCHAR, name VARCHAR, address VARCHAR, date VARCHAR, latitude REAL, longitude REAL, status BOOLEAN );");
             db.execSQL("INSERT INTO Reminder(title, name, address, date, latitude, longitude, status ) VALUES('" + mTitleEditText.getText().toString() + "', '" + mNameEditText.getText().toString() + "'," +
-                    "'" + mAddressEditText.getText().toString() + "', '" + mDateEditText.getText().toString() + "','"+ 0 + "','" + 0+ "','"+false+"');");
+                    "'" + mAddressEditText.getText().toString() + "', '" + mDateEditText.getText().toString() + "','"+ lat + "','" + lng+ "','"+false+"');");
             Toast.makeText(getApplicationContext(), "Added to visit List", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, MainActivity.class));
 
