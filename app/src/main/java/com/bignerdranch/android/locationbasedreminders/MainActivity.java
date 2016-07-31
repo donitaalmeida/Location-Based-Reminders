@@ -1,6 +1,7 @@
 package com.bignerdranch.android.locationbasedreminders;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -88,6 +89,15 @@ public class MainActivity extends ActionBarActivity {
         public int getCount() {
             return 2;
         }
+    }
+
+    public void startservice(View view) {
+        Location destination=new Location("");
+        destination.setLatitude(37.33511);
+        destination.setLongitude(-121.89102188);
+        Intent intent = new Intent(this, MyService.class);
+        intent.putExtra("destination", destination);
+        startService(intent);
     }
 
 

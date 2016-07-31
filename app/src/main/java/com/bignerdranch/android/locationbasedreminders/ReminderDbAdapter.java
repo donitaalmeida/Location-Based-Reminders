@@ -74,5 +74,10 @@ public class ReminderDbAdapter
         mDb.execSQL("UPDATE Reminder SET status='true' WHERE _id='"+ReminderId+"';");
         close();
     }
+    public void undo(int ReminderId){
+        open();
+        mDb.execSQL("UPDATE Reminder SET status='false' WHERE _id='"+ReminderId+"';");
+        close();
+    }
 
 }

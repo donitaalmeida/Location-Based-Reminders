@@ -1,14 +1,14 @@
 package com.bignerdranch.android.locationbasedreminders;
 
-import android.app.Activity;
-import android.content.Context;
+
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
+
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -46,22 +46,40 @@ public class ReminderInfoAdapter extends RecyclerView.Adapter<ReminderInfoAdapte
         placeViewHolder.vName.setText(ci.name);
         //TODO Format Date
         placeViewHolder.vDate.setText(ci.date.toString());
-        placeViewHolder.vDoneButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                ReminderDbAdapter dbAdapter=new ReminderDbAdapter(v.getContext());
-                dbAdapter.markAsDone(ci.id);
-                Toast.makeText(v.getContext(), "Reminder Marked as done", Toast.LENGTH_LONG).show();
-                v.getContext().startActivity(new Intent(v.getContext(),MainActivity.class));
-            }
-        });
+        if(!ci.status){
+            placeViewHolder.vDoneButton.setVisibility(View.VISIBLE);
+            placeViewHolder.vUndoButton.setVisibility(View.INVISIBLE);
+            placeViewHolder.vDoneButton.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    ReminderDbAdapter dbAdapter=new ReminderDbAdapter(v.getContext());
+                    dbAdapter.markAsDone(ci.id);
+                    Toast.makeText(v.getContext().getApplicationContext(), "Reminder Marked as done", Toast.LENGTH_LONG).show();
+                    v.getContext().startActivity(new Intent(v.getContext(),MainActivity.class));
+                }
+            });
+        }
+        else {
+            placeViewHolder.vUndoButton.setVisibility(View.VISIBLE);
+            placeViewHolder.vDoneButton.setVisibility(View.INVISIBLE);
+            placeViewHolder.vUndoButton.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    ReminderDbAdapter dbAdapter=new ReminderDbAdapter(v.getContext());
+                    dbAdapter.undo(ci.id);
+                    Toast.makeText(v.getContext().getApplicationContext(), "Undo", Toast.LENGTH_LONG).show();
+                    v.getContext().startActivity(new Intent(v.getContext(),MainActivity.class));
+                }
+            });
+        }
+
         placeViewHolder.vDeleteButton.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View v) {
                 ReminderDbAdapter dbAdapter=new ReminderDbAdapter(v.getContext());
                 dbAdapter.deleteReminder(ci.id);
-                Toast.makeText(v.getContext(), "Reminder deleted", Toast.LENGTH_LONG).show();
+                Toast.makeText(v.getContext().getApplicationContext(), "Reminder deleted", Toast.LENGTH_LONG).show();
                 v.getContext().startActivity(new Intent(v.getContext(),MainActivity.class));
 
             }
@@ -83,7 +101,9 @@ public class ReminderInfoAdapter extends RecyclerView.Adapter<ReminderInfoAdapte
         protected TextView vName;
         protected TextView vDate;
         protected ImageButton vDeleteButton;
-        protected ImageButton vDoneButton;
+        protected Button vDoneButton;
+        protected Button vUndoButton;
+
 
         public PlaceViewHolder(View v){
             super(v);
@@ -92,8 +112,8 @@ public class ReminderInfoAdapter extends RecyclerView.Adapter<ReminderInfoAdapte
             vName=(TextView)v.findViewById(R.id.name);
             vDate=(TextView)v.findViewById(R.id.date);
             vDeleteButton=(ImageButton) v.findViewById(R.id.deleteButton);
-
-            vDoneButton=(ImageButton) v.findViewById(R.id.doneButton);
+            vDoneButton=(Button) v.findViewById(R.id.doneButton);
+            vUndoButton=(Button)v.findViewById(R.id.undoButton);
         }
     }
 }
