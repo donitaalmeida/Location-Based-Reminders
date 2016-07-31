@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -14,22 +15,20 @@ import android.provider.ContactsContract;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
 import java.util.Calendar;
 import java.util.Date;
-
 /**
  * Created by shikh on 7/27/2016.
  */
@@ -50,13 +49,13 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     private EditText selectedContact;
     private ImageView selectedImage;
     private ImageView displayImage;
+    static SharedPreferences sharedPreferences;
     private static final int CAMERA_REQUEST = 1888;
     private int counter;
     private Handler updateBarHandler;
     String[] fromDate;
     public static boolean validateDateField = false;
     private ProgressDialog pDialog;
-    private Button mLocationButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,16 +64,8 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
-        if(getIntent().getExtras()!=null)
-        {
-            Bundle p = getIntent().getExtras();
-            String yourPrevious =p.getString("selectedcontact");
-            selectedContact=(EditText) findViewById(R.id.contacts_text);
-            selectedContact.setText(yourPrevious);
-            selectedContact.setEnabled(false);
-            selectedContact.setFocusable(false);
-        }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        sharedPreferences = getSharedPreferences("shared", MODE_PRIVATE);
         displayImage=(ImageView) findViewById(R.id.pasteImage);
         loadingSection=(LinearLayout)findViewById(R.id.loading);
         selectedImage=(ImageView) findViewById(R.id.capture);
@@ -96,16 +87,29 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                 // Perform action on click
             }
         });
+        if(getIntent().getExtras()!=null)
+        {
+            sharedPreferences = getSharedPreferences("shared", MODE_PRIVATE);
+            String title = sharedPreferences.getString("Title", null);
+            String placeAddress = sharedPreferences.getString("Place Address", null);
+            String placeName=sharedPreferences.getString("Place name",null);
+            String endDate=sharedPreferences.getString("End date",null);
+            Log.d("Display","Title is "+title);
+            Log.d("Display","Address is "+placeAddress);
+            Log.d("Display","Name is "+placeName);
+            Log.d("Display","End date is "+endDate);
+            mTitleEditText.setText(title);
+            mAddressEditText.setText(placeAddress);
+            mNameEditText.setText(placeName);
+            mDateEditText.setText(endDate);
+            Bundle p = getIntent().getExtras();
+            String yourPrevious =p.getString("selectedcontact");
+            selectedContact=(EditText) findViewById(R.id.contacts_text);
+            selectedContact.setText(yourPrevious);
+            selectedContact.setEnabled(false);
+            selectedContact.setFocusable(false);
+        }
         updateBarHandler =new Handler();
-        mLocationButton=(Button)findViewById(R.id.location_button);
-        mLocationButton.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(),MapActivity.class));
-            }
-        });
-
     }
 
     @Override
@@ -152,6 +156,24 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
        }
         return super.onOptionsItemSelected(item);
     }
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        sharedPreferences=getSharedPreferences("shared",MODE_PRIVATE);
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        editor.putString("Title",mTitleEditText.getText().toString());
+        editor.putString("Place Address",mAddressEditText.getText().toString());
+        editor.putString("Place name",mNameEditText.getText().toString());
+        editor.putString("End date",mDateEditText.getText().toString());
+        editor.commit();
+        super.onSaveInstanceState(savedInstanceState);
+        // Save UI state changes to the savedInstanceState.
+        // This bundle will be passed to onCreate if the process is
+        // killed and restarted.
+        /*savedInstanceState.putBoolean("MyBoolean", true);
+        savedInstanceState.putDouble("myDouble", 1.9);
+        savedInstanceState.putInt("MyInt", 1);
+        savedInstanceState.putString("MyString", "Welcome back to Android");*/
+    }
     public void displaycontacts(View view) {
         pDialog = new ProgressDialog(this);
         pDialog.setMessage("Reading contacts...");
@@ -166,8 +188,6 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
 
             }
         }).start();
-
-
     }
     public void getData() {
         ContentResolver resolver = getContentResolver();//is used to provide retrieval of contacts
@@ -193,11 +213,6 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                     phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                 }
                  phoneCursor.close();
-                /*Cursor emailCursor = resolver.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?", new String[]{id}, null);
-                while (emailCursor.moveToNext()) {
-                    email = emailCursor.getString(emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
-                }
-                 emailCursor.close();*/
                 nameNumberArray[i] = name + "  " + phoneNumber;
                 i++;
             }
@@ -224,7 +239,6 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
             }, 500);
         }
     }
-
     private void createReminder(){
         SQLiteDatabase db = openOrCreateDatabase("LocationBasedReminders", MODE_PRIVATE, null);
         Log.d("address",mAddressEditText.getText()+"");
@@ -235,6 +249,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                     "'" + mAddressEditText.getText().toString() + "', '" + mDateEditText.getText().toString() + "','"+ 0 + "','" + 0+ "','"+false+"');");
             Toast.makeText(getApplicationContext(), "Added to visit List", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, MainActivity.class));
+
         }
         else{
             LinearLayout linearLayout=(LinearLayout)findViewById(R.id.linear_layout);
