@@ -26,6 +26,7 @@
                     android:textStyle="bold"
                     android:textSize="@dimen/abc_action_bar_content_inset_material"
                     android:textColor="#000"/>
+
                 <EditText
                     android:id="@+id/title_edittext"
                     android:layout_width="match_parent"
@@ -44,7 +45,15 @@
         android:textStyle="bold"
         android:textSize="@dimen/abc_action_bar_content_inset_material"
         android:textColor="#000"/>
-    <EditText
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Location"
+                    android:id="@+id/location_button"
+                    android:layout_gravity="center_horizontal"/>
+
+                <EditText
         android:id="@+id/place_name_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

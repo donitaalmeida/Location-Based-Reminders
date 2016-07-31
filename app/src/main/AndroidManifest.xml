@@ -28,6 +28,20 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.bignerdranch.android.locationbasedreminders.AddReminder"/>
         </activity>
+        <activity android:name=".MapActivity"
+            android:parentActivityName=".AddReminder">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.bignerdranch.android.locationbasedreminders.AddReminder"/>
+        </activity>
+        <uses-library android:name="com.google.android.maps"/>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyC49CWhi9Iun8OFcC5_ukpgneOG6nO4T4A"/>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>

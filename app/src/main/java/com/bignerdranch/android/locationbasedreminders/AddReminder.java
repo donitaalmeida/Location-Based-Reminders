@@ -56,6 +56,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     String[] fromDate;
     public static boolean validateDateField = false;
     private ProgressDialog pDialog;
+    private Button mLocationButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +97,14 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
             }
         });
         updateBarHandler =new Handler();
+        mLocationButton=(Button)findViewById(R.id.location_button);
+        mLocationButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),MapActivity.class));
+            }
+        });
 
     }
 
@@ -184,11 +193,11 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                     phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                 }
                  phoneCursor.close();
-                Cursor emailCursor = resolver.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?", new String[]{id}, null);
+                /*Cursor emailCursor = resolver.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?", new String[]{id}, null);
                 while (emailCursor.moveToNext()) {
                     email = emailCursor.getString(emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
                 }
-                 emailCursor.close();
+                 emailCursor.close();*/
                 nameNumberArray[i] = name + "  " + phoneNumber;
                 i++;
             }
@@ -216,11 +225,6 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         }
     }
 
-
-
-
-
-
     private void createReminder(){
         SQLiteDatabase db = openOrCreateDatabase("LocationBasedReminders", MODE_PRIVATE, null);
         Log.d("address",mAddressEditText.getText()+"");
@@ -231,7 +235,6 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                     "'" + mAddressEditText.getText().toString() + "', '" + mDateEditText.getText().toString() + "','"+ 0 + "','" + 0+ "','"+false+"');");
             Toast.makeText(getApplicationContext(), "Added to visit List", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, MainActivity.class));
-
         }
         else{
             LinearLayout linearLayout=(LinearLayout)findViewById(R.id.linear_layout);
