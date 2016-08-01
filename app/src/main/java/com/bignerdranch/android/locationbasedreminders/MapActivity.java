@@ -138,8 +138,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         //initailize map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-
     }
     public Marker setMarker(LatLng current, String address){
         mGoogleMap.setOnMarkerClickListener(this);

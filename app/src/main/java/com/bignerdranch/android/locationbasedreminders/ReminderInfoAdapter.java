@@ -40,7 +40,7 @@ public class ReminderInfoAdapter extends RecyclerView.Adapter<ReminderInfoAdapte
 
     @Override
     public void onBindViewHolder(PlaceViewHolder placeViewHolder, int i) {
-        ci = placeList.get(i);
+        ci = placeList.get(i);;
         placeViewHolder.vTitle.setText(ci.title);
         placeViewHolder.vAddress.setText(ci.address);
         placeViewHolder.vName.setText(ci.name);
@@ -92,6 +92,13 @@ public class ReminderInfoAdapter extends RecyclerView.Adapter<ReminderInfoAdapte
         View itemView = LayoutInflater.
                 from(viewGroup.getContext()).
                 inflate(R.layout.card_layout, viewGroup, false);
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Toast.makeText(v.getContext().getApplicationContext(), "Card selected", Toast.LENGTH_SHORT).show();
+                v.getContext().startActivity(new Intent(v.getContext().getApplicationContext(),ReminderDetailsActivity.class));
+            }
+        });
         return new PlaceViewHolder(itemView);
     }
 

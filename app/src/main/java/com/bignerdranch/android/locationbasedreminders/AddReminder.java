@@ -1,17 +1,24 @@
 package com.bignerdranch.android.locationbasedreminders;
 
+import android.*;
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
@@ -27,6 +34,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+
+import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
 /**
@@ -58,6 +67,9 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     private ProgressDialog pDialog;
     private double lat,lng;
     private Button mLocationButton;
+    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    private Uri imageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +83,29 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         displayImage=(ImageView) findViewById(R.id.pasteImage);
         loadingSection=(LinearLayout)findViewById(R.id.loading);
         selectedImage=(ImageView) findViewById(R.id.capture);
+        if(getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+            selectedImage.setVisibility(View.VISIBLE);
+            selectedImage.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View v) {
+                    dispatchTakePictureIntent();
+                }
+            });
+        }
         contactsText = (ImageView) findViewById(R.id.imageIcon);
+        contactsText.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(android.Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
+                }else{
+                    displaycontacts(v);
+                }
+
+            }
+        });
         mAddressEditText = (EditText) findViewById(R.id.place_address_edittext);
         mTitleEditText = (EditText) findViewById(R.id.title_edittext);
         mNameEditText = (EditText) findViewById(R.id.place_name_edittext);
@@ -89,6 +123,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                 // Perform action on click
             }
         });
+
         if(getIntent().getExtras()!=null)
         {
             sharedPreferences = getSharedPreferences("shared", MODE_PRIVATE);
@@ -140,16 +175,44 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         getMenuInflater().inflate(R.menu.menu_sub,menu);
         return true;
     }
-    public void takeImageFromCamera(View view) {
-                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
-             }
+   /* public void takeImageFromCamera(View view) {
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File photo = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "pic.jpg");
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                Uri.fromFile(photo));
+        imageUri = Uri.fromFile(photo);
+        Log.d("Display","URI is "+imageUri);
+        startActivityForResult(cameraIntent, CAMERA_REQUEST);
+*/
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            Log.d("display","has camera app");
+            //File photo = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "pic.jpg");
+            // Log.e("Pname",photo.getAbsolutePath().toString().substring(19));
+            //takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
+            //takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,photo.getAbsolutePath().toString().substring(19) );
+
+         //   imageUri = Uri.fromFile(photo);
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }else{
+            Log.d("display","no camera app");
+        }
+
+    }
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-               if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
-                        Bitmap mphoto = (Bitmap) data.getExtras().get("data");
-                        displayImage.setImageBitmap(mphoto);
-                    }
-           }
+        if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
+            Bitmap mphoto = (Bitmap) data.getExtras().get("data");
+            displayImage.setImageBitmap(mphoto);
+        }
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            displayImage.setImageBitmap(imageBitmap);
+        }
+    }
     private DatePickerDialog.OnDateSetListener fromListener = new DatePickerDialog.OnDateSetListener(){
         public void onDateSet(DatePicker view, int from_year, int from_month,
                               int from_day) {
@@ -198,19 +261,29 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         savedInstanceState.putString("MyString", "Welcome back to Android");*/
     }
     public void displaycontacts(View view) {
-        pDialog = new ProgressDialog(this);
-        pDialog.setMessage("Reading contacts...");
-        pDialog.setCancelable(false);
-        pDialog.show();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
-                getData();
 
+            pDialog = new ProgressDialog(this);
+            pDialog.setMessage("Reading contacts...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    getData();
+                }
+            }).start();
 
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_READ_CONTACTS: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                  displaycontacts(contactsText);
+                }
             }
-        }).start();
+            return;
+        }
     }
     public void getData() {
         ContentResolver resolver = getContentResolver();//is used to provide retrieval of contacts
