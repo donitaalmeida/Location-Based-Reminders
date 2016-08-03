@@ -37,6 +37,7 @@ public class ReminderDetailsActivity extends AppCompatActivity {
     private  ReminderDbAdapter dbHelper;
     private Button mClickButton;
     private ImageButton shareButton;
+    private Intent serviceIntent;
     String title, name, address, image,contact;
     float latitude, longitude;
     String date;
@@ -99,6 +100,16 @@ public class ReminderDetailsActivity extends AppCompatActivity {
        return bmp;
     }
 
+    public void startService() {
+        serviceIntent = new Intent(this, LocationService.class);
+        startService(serviceIntent);
+    }
+
+    public void stopService(){
+            if(serviceIntent!=null){
+                stopService(serviceIntent);
+            }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -173,7 +184,9 @@ public class ReminderDetailsActivity extends AppCompatActivity {
                 vDoneButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                            stopService();
                             dbHelper.markAsDone(id);
+                            startService();
                             Toast.makeText(v.getContext().getApplicationContext(), "Reminder Marked as done", Toast.LENGTH_LONG).show();
                             startActivity(new Intent(v.getContext(), MainActivity.class));
                     }

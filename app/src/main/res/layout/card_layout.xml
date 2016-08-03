@@ -86,7 +86,7 @@
             />
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/undoButton"
             android:text="Undo"
@@ -95,6 +95,7 @@
             android:enabled="true"
             android:layout_alignTop="@+id/doneButton"
             android:layout_alignLeft="@+id/doneButton"
-            android:layout_alignStart="@+id/doneButton"/>
+            android:layout_alignStart="@+id/doneButton"
+          />
     </RelativeLayout>
 </android.support.v7.widget.CardView>

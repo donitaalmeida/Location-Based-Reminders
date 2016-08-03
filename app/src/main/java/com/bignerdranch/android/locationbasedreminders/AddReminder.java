@@ -47,6 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by shikh on 7/27/2016.
@@ -247,21 +248,19 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     private void updateLabelStart() {
 
         validateDateField=true;
-        new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        DateFormat df = new SimpleDateFormat("MMMM dd, yyyy",Locale.US);
+        df.setTimeZone(TimeZone.getDefault());
         mDateEditText.setText(df.format(myCalendar.getTime()));
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
         int id=item.getItemId();
-        if(id==R.id.action_settings) {
+        if(id==R.id.enable_service) {
             return true;
         }
        if(id==android.R.id.home) {
-           Intent intent = NavUtils.getParentActivityIntent(this);
-           intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-           NavUtils.navigateUpTo(this, intent);
+
        }
         return super.onOptionsItemSelected(item);
     }

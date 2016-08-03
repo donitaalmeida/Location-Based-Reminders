@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by donita on 30-07-2016.
@@ -49,7 +50,9 @@ public  class MyFragment extends Fragment {
                     address = cursor.getString(cursor.getColumnIndex("address"));
                     latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
                     longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
-                    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                    DateFormat formatter = new SimpleDateFormat("MMMM dd, yyyy",Locale.US);
+                    formatter.setTimeZone(TimeZone.getDefault());
+                    Log.e("donita",TimeZone.getDefault().getDisplayName());
                     try {
                         Log.e("date","1"+cursor.getString(cursor.getColumnIndex("date"))+"1");
 
@@ -67,6 +70,7 @@ public  class MyFragment extends Fragment {
             }while(cursor.moveToNext());
         }
         cursor.close();
+        dbHelper.close();
         return reminderList;
     }
 
