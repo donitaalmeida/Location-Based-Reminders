@@ -6,6 +6,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
 import java.util.Date;
 
 /**
@@ -20,7 +22,7 @@ public class ReminderDbAdapter
     private static final int DATABASE_VERSION = 1;
     private final Context mCtx;
     private static final String DATABASE_CREATE = "CREATE TABLE IF NOT EXISTS Reminder( _id INTEGER PRIMARY KEY AUTOINCREMENT," +
-            "title VARCHAR, name VARCHAR, address VARCHAR, date VARCHAR, latitude REAL, longitude REAL, status BOOLEAN );";
+            "title VARCHAR, name VARCHAR, address VARCHAR, date VARCHAR, latitude REAL, longitude REAL, status BOOLEAN, contact VARCHAR, image VARCHAR );";
 
     private static class DatabaseHelper extends SQLiteOpenHelper {
         DatabaseHelper(Context context) {
@@ -63,6 +65,23 @@ public class ReminderDbAdapter
             mCursor.moveToFirst();
         }
         return mCursor;
+    }
+    public Cursor fetchOneReminder(int ReminderId){
+
+        Cursor c = mDb.rawQuery("SELECT * FROM " + SQLITE_TABLE + " where _id = '"+ReminderId+"'", null);
+        if (c != null ) {
+         c.moveToFirst();
+        }
+        return c;
+      /*  Cursor mCursor=  mDb.query(SQLITE_TABLE, new String[] {
+                        "_id", "title", "name", "address", "date","latitude","longitude","status"},
+                "_id =?", new String[]{"'"+ReminderId+"'"}, null, null, null);
+        if (mCursor != null) {
+            Log.e("data","cursor is not null");
+            //mCursor.moveToFirst();
+        }
+        return mCursor;*/
+
     }
     public void deleteReminder(int ReminderId ){
         open();

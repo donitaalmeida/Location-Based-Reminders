@@ -16,6 +16,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by donita on 30-07-2016.
@@ -48,9 +49,11 @@ public  class MyFragment extends Fragment {
                     address = cursor.getString(cursor.getColumnIndex("address"));
                     latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
                     longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
-                    DateFormat formatter = new SimpleDateFormat("d-MMM-yyyy,HH:mm:ss aaa");
+                    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
                     try {
-                        date = formatter.parse((cursor.getString(cursor.getColumnIndex("date"))));
+                        Log.e("date","1"+cursor.getString(cursor.getColumnIndex("date"))+"1");
+
+                        date = formatter.parse(cursor.getString(cursor.getColumnIndex("date")));
 
                     } catch (ParseException e) {
                         e.printStackTrace();

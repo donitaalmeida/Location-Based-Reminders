@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -23,6 +24,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,8 +39,15 @@ import android.widget.Toast;
 
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+
 /**
  * Created by shikh on 7/27/2016.
  */
@@ -59,7 +69,6 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     private ImageView selectedImage;
     private ImageView displayImage;
     static SharedPreferences sharedPreferences;
-    private static final int CAMERA_REQUEST = 1888;
     private int counter;
     private Handler updateBarHandler;
     String[] fromDate;
@@ -68,8 +77,10 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     private double lat,lng;
     private Button mLocationButton;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
+    private static final int PERMISSIONS_WRITE_EXTERNAL_STORAGE=105;
     static final int REQUEST_IMAGE_CAPTURE = 1;
-    private Uri imageUri;
+    private String imageName;
+    private Bitmap imageBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,15 +92,18 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         sharedPreferences = getSharedPreferences("shared", MODE_PRIVATE);
         displayImage=(ImageView) findViewById(R.id.pasteImage);
-        loadingSection=(LinearLayout)findViewById(R.id.loading);
+
         selectedImage=(ImageView) findViewById(R.id.capture);
         if(getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
             selectedImage.setVisibility(View.VISIBLE);
             selectedImage.setOnClickListener(new View.OnClickListener(){
-
                 @Override
                 public void onClick(View v) {
-                    dispatchTakePictureIntent();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSIONS_WRITE_EXTERNAL_STORAGE);
+                    }else{
+                        dispatchTakePictureIntent();
+                    }
                 }
             });
         }
@@ -103,7 +117,6 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                 }else{
                     displaycontacts(v);
                 }
-
             }
         });
         mAddressEditText = (EditText) findViewById(R.id.place_address_edittext);
@@ -135,18 +148,14 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
             Log.d("Display","Address is "+placeAddress);
             Log.d("Display","Name is "+placeName);
             Log.d("Display","End date is "+endDate);
-
             Bundle p = getIntent().getExtras();
             String yourPrevious =p.getString("selectedcontact");
             selectedContact=(EditText) findViewById(R.id.contacts_text);
             if(yourPrevious!=null){
-
                 selectedContact.setText(yourPrevious);
                 selectedContact.setEnabled(false);
                 selectedContact.setFocusable(false);
             }
-
-
             if(p.getString("placeName")!=null){
                 placeName=p.getString("placeName");
                 placeAddress=p.getString("placeAddress");
@@ -175,44 +184,56 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         getMenuInflater().inflate(R.menu.menu_sub,menu);
         return true;
     }
-   /* public void takeImageFromCamera(View view) {
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File photo = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "pic.jpg");
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                Uri.fromFile(photo));
-        imageUri = Uri.fromFile(photo);
-        Log.d("Display","URI is "+imageUri);
-        startActivityForResult(cameraIntent, CAMERA_REQUEST);
-*/
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             Log.d("display","has camera app");
-            //File photo = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "pic.jpg");
-            // Log.e("Pname",photo.getAbsolutePath().toString().substring(19));
-            //takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
-            //takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,photo.getAbsolutePath().toString().substring(19) );
-
-         //   imageUri = Uri.fromFile(photo);
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }else{
             Log.d("display","no camera app");
         }
-
     }
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
-            Bitmap mphoto = (Bitmap) data.getExtras().get("data");
-            displayImage.setImageBitmap(mphoto);
-        }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            imageBitmap = (Bitmap) extras.get("data");
             displayImage.setImageBitmap(imageBitmap);
+            imageName="LBR"+new Date().getTime()+".png";
+         /*   if(saveImage(name,imageBitmap)){
+                Toast.makeText(getApplicationContext(), "Image Saved", Toast.LENGTH_SHORT).show();
+            }
+            displayImage.setImageBitmap(getImageFromDevice(name));*/
         }
     }
+
+    private boolean saveImage(String imageName, Bitmap imageBitmap){
+        File sdCardDirectory = Environment.getExternalStorageDirectory();
+        File image = new File(sdCardDirectory, imageName);
+        boolean success = false;
+        FileOutputStream outStream;
+        try {
+            outStream = new FileOutputStream(image);
+            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+            outStream.flush();
+            outStream.close();
+            success = true;
+            Log.e("path",image.getCanonicalPath());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return success;
+    }
+    private Bitmap getImageFromDevice(String imageName){
+        File f = new File(Environment.getExternalStorageDirectory()+"/"+imageName);
+        Bitmap bmp = BitmapFactory.decodeFile(f.getAbsolutePath());
+        return bmp;
+    }
+
     private DatePickerDialog.OnDateSetListener fromListener = new DatePickerDialog.OnDateSetListener(){
         public void onDateSet(DatePicker view, int from_year, int from_month,
                               int from_day) {
@@ -226,7 +247,9 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     private void updateLabelStart() {
 
         validateDateField=true;
-        mDateEditText.setText(myCalendar.getTime().toString());
+        new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        mDateEditText.setText(df.format(myCalendar.getTime()));
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
@@ -244,12 +267,15 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     }
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
+
+        savedInstanceState.putParcelable("imageBitmap", imageBitmap);
         sharedPreferences=getSharedPreferences("shared",MODE_PRIVATE);
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putString("Title",mTitleEditText.getText().toString());
         editor.putString("Place Address",mAddressEditText.getText().toString());
         editor.putString("Place name",mNameEditText.getText().toString());
         editor.putString("End date",mDateEditText.getText().toString());
+
         editor.commit();
         super.onSaveInstanceState(savedInstanceState);
         // Save UI state changes to the savedInstanceState.
@@ -260,8 +286,12 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         savedInstanceState.putInt("MyInt", 1);
         savedInstanceState.putString("MyString", "Welcome back to Android");*/
     }
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState){
+        imageBitmap = savedInstanceState.getParcelable("imageBitmap");
+        displayImage.setImageBitmap(imageBitmap);
+    }
     public void displaycontacts(View view) {
-
             pDialog = new ProgressDialog(this);
             pDialog.setMessage("Reading contacts...");
             pDialog.setCancelable(false);
@@ -272,7 +302,6 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                     getData();
                 }
             }).start();
-
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
@@ -283,6 +312,11 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                 }
             }
             return;
+            case PERMISSIONS_WRITE_EXTERNAL_STORAGE:{
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    dispatchTakePictureIntent();
+                }
+            }
         }
     }
     public void getData() {
@@ -290,7 +324,6 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         Cursor cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);//provided null values because I want to retrieve all contacts
         nameNumberArray = new String[cursor.getCount()];
         String phoneNumber = new String();
-        String email = new String();
         int i = 0;
         final int total=cursor.getCount();
 
@@ -309,7 +342,10 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                     phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                 }
                  phoneCursor.close();
-                nameNumberArray[i] = name + "  " + phoneNumber;
+                 if(phoneNumber!=null){
+                     nameNumberArray[i] = name + "  " + phoneNumber;
+                 }
+
                 i++;
             }
             cursor.close();
@@ -339,10 +375,15 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         SQLiteDatabase db = openOrCreateDatabase("LocationBasedReminders", MODE_PRIVATE, null);
         Log.d("address",mAddressEditText.getText()+"");
         if(!mAddressEditText.getText().toString().equals("")&&!mTitleEditText.getText().toString().equals("")&&!mDateEditText.getText().toString().equals("")&&!mNameEditText.getText().toString().equals("")){
+            if(imageName!=null){
+                if(saveImage(imageName,imageBitmap)){
+                    Toast.makeText(getApplicationContext(), "Image Saved", Toast.LENGTH_SHORT).show();
+                }
+            }
             db.execSQL("CREATE TABLE IF NOT EXISTS Reminder( _id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "title VARCHAR, name VARCHAR, address VARCHAR, date VARCHAR, latitude REAL, longitude REAL, status BOOLEAN );");
-            db.execSQL("INSERT INTO Reminder(title, name, address, date, latitude, longitude, status ) VALUES('" + mTitleEditText.getText().toString() + "', '" + mNameEditText.getText().toString() + "'," +
-                    "'" + mAddressEditText.getText().toString() + "', '" + mDateEditText.getText().toString() + "','"+ lat + "','" + lng+ "','"+false+"');");
+                    "title VARCHAR, name VARCHAR, address VARCHAR, date VARCHAR, latitude REAL, longitude REAL, status BOOLEAN,contact VARCHAR,image VARCHAR );");
+            db.execSQL("INSERT INTO Reminder(title, name, address, date, latitude, longitude, status, contact, image ) VALUES('" + mTitleEditText.getText().toString() + "', '" + mNameEditText.getText().toString() + "'," +
+                    "'" + mAddressEditText.getText().toString() + "', '" + mDateEditText.getText().toString() + "','"+ lat + "','" + lng+ "','"+false+"','"+selectedContact.getText()+"','"+imageName+"');");
             Toast.makeText(getApplicationContext(), "Added to visit List", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, MainActivity.class));
 

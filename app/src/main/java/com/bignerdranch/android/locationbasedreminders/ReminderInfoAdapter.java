@@ -4,6 +4,7 @@ package com.bignerdranch.android.locationbasedreminders;
 import android.content.Intent;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by donita on 12-07-2016.
@@ -45,7 +49,8 @@ public class ReminderInfoAdapter extends RecyclerView.Adapter<ReminderInfoAdapte
         placeViewHolder.vAddress.setText(ci.address);
         placeViewHolder.vName.setText(ci.name);
         //TODO Format Date
-        placeViewHolder.vDate.setText(ci.date.toString());
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        placeViewHolder.vDate.setText(df.format(ci.date));
         if(!ci.status){
             placeViewHolder.vDoneButton.setVisibility(View.VISIBLE);
             placeViewHolder.vUndoButton.setVisibility(View.INVISIBLE);
@@ -95,8 +100,10 @@ public class ReminderInfoAdapter extends RecyclerView.Adapter<ReminderInfoAdapte
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(v.getContext().getApplicationContext(), "Card selected", Toast.LENGTH_SHORT).show();
-                v.getContext().startActivity(new Intent(v.getContext().getApplicationContext(),ReminderDetailsActivity.class));
+                Intent intent=new Intent(v.getContext().getApplicationContext(),ReminderDetailsActivity.class);
+                Log.d("ci",ci.id+"");
+                intent.putExtra("id",ci.id);
+                v.getContext().startActivity(intent);
             }
         });
         return new PlaceViewHolder(itemView);

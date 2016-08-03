@@ -22,7 +22,7 @@ public class DisplayContacts extends Activity implements AdapterView.OnItemClick
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("Display","Inside onCreate method");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.displaycontacts);
+        setContentView(R.layout.activity_display_contacts);
         l= (ListView) findViewById(R.id.contacts);
 
         Bundle b=this.getIntent().getExtras();

@@ -19,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
@@ -61,12 +62,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Snackbar snackbarGpsNetwork = null;
     private PlaceAutocompleteFragment autocompleteFragment;
     private Place searchedPlace;
+    private LinearLayout mLinearLayout;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        mLinearLayout=(LinearLayout) findViewById(R.id.mylay);
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -212,6 +215,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
     //check if GPS and Netork are enabled and promt user to enable the same if required
     private void showGpsNetworkSnackbar() {
+
         boolean flag = false;
         StringBuilder msg = new StringBuilder();
         if(!isGpsEnabled()){
@@ -228,7 +232,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         if (flag) {
 
-            snackbarGpsNetwork = Snackbar.make(toolbar, msg.toString(), Snackbar.LENGTH_INDEFINITE);
+            snackbarGpsNetwork = Snackbar.make(mLinearLayout, msg.toString(), Snackbar.LENGTH_INDEFINITE);
             if(!isNetworkEnabled()){
                 snackbarGpsNetwork.setAction("Enable Internet", new View.OnClickListener() {
                     @Override
