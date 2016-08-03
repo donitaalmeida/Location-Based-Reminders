@@ -54,6 +54,21 @@ public class MainActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_items,menu);
         return true;
     }
+    public void startService(View view)
+    {
+
+        //sap center 37.332983, -121.901226
+        Location destination=new Location("");
+        // destination.setLatitude(37.338234);
+        // destination.setLongitude(-121.883916);
+        destination.setLatitude(37.332983);
+        destination.setLongitude(-121.901226);
+        //destination.setLatitude(37.329012);
+        //destination.setLongitude(-121.916021);
+        Intent intent = new Intent(this, LocationService.class);
+        intent.putExtra("destination", destination);
+        startService(intent);
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
