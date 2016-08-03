@@ -5,4 +5,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#C41E3A"
     app:theme="@style/MyCustomToolBarTheme">
+    <ImageButton
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/shareButton"
+        android:longClickable="true"
+        android:src="@mipmap/share3"
+        android:layout_gravity="right"
+        android:visibility="invisible"/>
 </android.support.v7.widget.Toolbar>

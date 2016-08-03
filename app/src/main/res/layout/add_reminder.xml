@@ -10,12 +10,14 @@
             android:orientation="vertical"
             android:id="@+id/linear_layout"
             android:focusable="true"
-            android:focusableInTouchMode="true">
+            android:focusableInTouchMode="true"
+            >
             <include android:id="@+id/app_bar" layout="@layout/app_bar"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_margin="@dimen/cardview_default_elevation">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -37,7 +39,36 @@
                     android:inputType="textAutoCorrect"
                     android:contentDescription="Enter title for your reminder"
                     />
-    <TextView
+
+                <RadioGroup
+                    android:id="@+id/radioSex"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <RadioButton
+                        android:id="@+id/general"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="General"
+                        android:checked="true" />
+
+                    <RadioButton
+                        android:id="@+id/specific"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Specific Type" />
+
+                </RadioGroup>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Location"
+                    android:id="@+id/location_button"
+                    android:theme="@style/AppTheme.Button"
+                    android:layout_gravity="center_horizontal"/>
+
+                <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Place Name"
@@ -50,19 +81,14 @@
         android:textSize="@dimen/abc_action_bar_content_inset_material"
         android:textColor="#000"/>
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Select Location"
-                    android:id="@+id/location_button"
-                    android:layout_gravity="center_horizontal"/>
-
                 <EditText
-        android:id="@+id/place_name_edittext"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textAutoCorrect"
-        android:textSize="20sp"/>
+                    android:id="@+id/place_name_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textAutoCorrect"
+                    android:textSize="20sp"
+                    android:enabled="true"
+                    android:clickable="true"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -74,13 +100,16 @@
         android:layout_margin="12dp"
         android:textStyle="bold"
         android:textSize="@dimen/abc_action_bar_content_inset_material"
-        android:textColor="#000"/>
+        android:textColor="#000"
+        />
     <EditText
         android:id="@+id/place_address_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textAutoCorrect"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        android:enabled="true"
+        android:clickable="false"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -99,7 +128,9 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:inputType="textAutoCorrect"
-        android:focusable="false"/>
+        android:focusable="false"
+        android:clickable="false"
+        />
             </LinearLayout>
 
             <RelativeLayout
@@ -132,29 +163,27 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/pasteImage"/>
                 </LinearLayout>
-                <LinearLayout
-                    android:id="@+id/loading"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
 
-                </LinearLayout>
                 <Button
                     android:id="@+id/save_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Save"
                     android:layout_alignParentBottom="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"/>
+                    android:layout_toRightOf="@+id/imageButton"
+                    android:layout_toEndOf="@+id/imageButton"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginStart="30dp"
+                    android:theme="@style/AppTheme.Button"/>
                 <Button
                     android:id="@+id/cancel_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Cancel"
-                    android:layout_alignTop="@+id/save_button"
-                    android:layout_toRightOf="@+id/save_button"
-                    android:layout_toEndOf="@+id/save_button"/>
+                    android:layout_alignParentBottom="true"
+                    android:layout_toRightOf="@+id/contacts_text"
+                    android:layout_toEndOf="@+id/contacts_text"
+                    android:theme="@style/AppTheme.Button"/>
 
 
                 <ImageView
@@ -171,10 +200,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/captureimage"
-                    android:layout_above="@+id/save_button"
-                    android:layout_toRightOf="@+id/linearLayout"
-                    android:layout_toEndOf="@+id/linearLayout"
-                    android:visibility="invisible"/>
+                    android:visibility="visible"
+                    android:layout_below="@+id/imageIcon"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"/>
 
                 <EditText
                     android:layout_width="wrap_content"
@@ -185,6 +214,15 @@
                     android:layout_toEndOf="@+id/save_button"
                     android:layout_marginLeft="27dp"
                     android:layout_marginStart="27dp"/>
+
+                <ImageButton
+                    android:layout_width="40dp"
+                    android:layout_height="45dp"
+                    android:id="@+id/imageButton"
+                    android:src="@mipmap/notes"
+                    android:layout_below="@+id/capture"
+                    android:layout_alignRight="@+id/capture"
+                    android:layout_alignEnd="@+id/capture"/>
             </RelativeLayout>
 
         </LinearLayout>
