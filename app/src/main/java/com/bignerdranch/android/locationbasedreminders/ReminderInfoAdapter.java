@@ -19,6 +19,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by donita on 12-07-2016.
@@ -49,7 +50,8 @@ public class ReminderInfoAdapter extends RecyclerView.Adapter<ReminderInfoAdapte
         placeViewHolder.vAddress.setText(ci.address);
         placeViewHolder.vName.setText(ci.name);
         //TODO Format Date
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        DateFormat df =new SimpleDateFormat("MMMM dd, yyyy",Locale.US);
+        df.setTimeZone(TimeZone.getDefault());
         placeViewHolder.vDate.setText(df.format(ci.date));
         if(!ci.status){
             placeViewHolder.vDoneButton.setVisibility(View.VISIBLE);

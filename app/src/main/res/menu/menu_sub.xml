@@ -3,11 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/enable_service"
         android:icon="@drawable/ic_launcher"
         android:showAsAction="always"
         android:orderInCategory="10"
-        android:title="Settings"
+        android:title="Enable Reminders"
+        android:checkable="true"
+        tools:ignore="AppCompatResource">
+    </item>
+    <item
+        android:id="@+id/diable_service"
+        android:icon="@drawable/ic_launcher"
+        android:showAsAction="always"
+        android:orderInCategory="10"
+        android:title="Disable Reminders"
+        android:checkable="true"
         tools:ignore="AppCompatResource">
     </item>
 

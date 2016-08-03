@@ -1,9 +1,14 @@
 package com.bignerdranch.android.locationbasedreminders;
 
+import android.*;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -25,57 +30,103 @@ public class MainActivity extends ActionBarActivity {
     private static ArrayList<ReminderInfo> reminderList = new ArrayList<>();
     private static ReminderDbAdapter dbHelper;
     private SimpleCursorAdapter dataAdapter;
-
+    private Intent serviceIntent;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 125;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        toolbar=(Toolbar)findViewById(R.id.app_bar);
-        setSupportActionBar(toolbar);
-        vPager=(ViewPager) findViewById(R.id.pager);
-        vPager.setAdapter(new PagerAdapter(getSupportFragmentManager()));
-        slideTabs=(SlidingTabLayout)findViewById(R.id.tabs);
-        if(slideTabs!=null){
-            slideTabs.setViewPager(vPager);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        } else {
+            toolbar=(Toolbar)findViewById(R.id.app_bar);
+            setSupportActionBar(toolbar);
+            vPager=(ViewPager) findViewById(R.id.pager);
+            vPager.setAdapter(new PagerAdapter(getSupportFragmentManager()));
+            slideTabs=(SlidingTabLayout)findViewById(R.id.tabs);
+            if(slideTabs!=null){
+                slideTabs.setViewPager(vPager);
+            }
+            FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+            if(floatingActionButton!=null){
+                floatingActionButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent=new Intent(getApplicationContext(),AddReminder.class);
+                        startActivity(intent);
+                    }
+                });
+            }
+
         }
-        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
-        if(floatingActionButton!=null){
-           floatingActionButton.setOnClickListener(new View.OnClickListener() {
-               @Override
-               public void onClick(View v) {
-                   Intent intent=new Intent(getApplicationContext(),AddReminder.class);
-                   startActivity(intent);
-               }
-           });
-       }
+
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    toolbar=(Toolbar)findViewById(R.id.app_bar);
+                    setSupportActionBar(toolbar);
+                    vPager=(ViewPager) findViewById(R.id.pager);
+                    vPager.setAdapter(new PagerAdapter(getSupportFragmentManager()));
+                    slideTabs=(SlidingTabLayout)findViewById(R.id.tabs);
+                    if(slideTabs!=null){
+                        slideTabs.setViewPager(vPager);
+                    }
+                    FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+                    if(floatingActionButton!=null){
+                        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent=new Intent(getApplicationContext(),AddReminder.class);
+                                startActivity(intent);
+                            }
+                        });
+                    }
+                } else {
+
+                    Snackbar.make(toolbar, "Location access is required to show coffee shops nearby.", Snackbar.LENGTH_INDEFINITE)
+                            .setAction("OK", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                        requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+                                    }
+                                }
+                            }).setActionTextColor(Color.RED).show();
+                }
+                return;
+            }
+
+        }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_items,menu);
         return true;
     }
-    public void startService(View view)
-    {
+    public void startService(View view) {
+        serviceIntent = new Intent(this, LocationService.class);
+        startService(serviceIntent);
+    }
 
-        //sap center 37.332983, -121.901226
-        Location destination=new Location("");
-        // destination.setLatitude(37.338234);
-        // destination.setLongitude(-121.883916);
-        destination.setLatitude(37.332983);
-        destination.setLongitude(-121.901226);
-        //destination.setLatitude(37.329012);
-        //destination.setLongitude(-121.916021);
-        Intent intent = new Intent(this, LocationService.class);
-        intent.putExtra("destination", destination);
-        startService(intent);
+    public void stopService(View view){
+        if(serviceIntent!=null){
+            stopService(serviceIntent);
+        }
     }
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-       int id=item.getItemId();
-        if(id==R.id.action_settings)
-        {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        item.setChecked(true);
+        int id=item.getItemId();
+        if(id==R.id.enable_service) {
+            startService(getCurrentFocus());
             return true;
+        }
+        else if(id==R.id.diable_service){
+            stopService(getCurrentFocus());
         }
         return super.onOptionsItemSelected(item);
     }
@@ -114,6 +165,7 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(this, MyService.class);
         intent.putExtra("destination", destination);
         startService(intent);
+        stopService(intent);
     }
 
 
