@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -24,7 +25,9 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class ReminderDetailsActivity extends AppCompatActivity {
     private TextView vTitle;
@@ -47,6 +50,7 @@ public class ReminderDetailsActivity extends AppCompatActivity {
     //private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     private ImageView displayImage;
+   // private ImageView circularImage;
     private Bitmap imageBitmap;
     Uri targetUri;
 
@@ -65,13 +69,14 @@ public class ReminderDetailsActivity extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             imageBitmap = (Bitmap) extras.get("data");
-
             targetUri=data.getData();
             String name="LBR"+new Date().getTime()+".png";
             if(saveImage(name,imageBitmap)){
                 Toast.makeText(getApplicationContext(), "Image Saved", Toast.LENGTH_SHORT).show();
             }
             displayImage.setImageBitmap(getImageFromDevice(name));
+           // circularImage.setImageBitmap(getImageFromDevice(name));
+            //image is inserted here
         }
     }
 
@@ -120,6 +125,7 @@ public class ReminderDetailsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         displayImage=(ImageView)findViewById(R.id.capturedImage);
+        //circularImage=(ImageView)findViewById(R.id.circleView);
         shareButton=(ImageButton)findViewById(R.id.shareButton);
 
         shareButton.setOnClickListener(new View.OnClickListener() {
@@ -167,6 +173,7 @@ public class ReminderDetailsActivity extends AppCompatActivity {
             vDate.setText(date);
             if(image!=null){
                 displayImage.setImageBitmap(getImageFromDevice(image));
+                //circularImage.setImageBitmap(getImageFromDevice(image));
             }
 
             vDeleteButton.setOnClickListener(new View.OnClickListener() {
@@ -216,16 +223,46 @@ public class ReminderDetailsActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState){
         imageBitmap = savedInstanceState.getParcelable("imageBitmap");
-        displayImage.setImageBitmap(imageBitmap);
+       displayImage.setImageBitmap(imageBitmap);
+       // circularImage.setImageBitmap(imageBitmap);
     }
-
+//Code for sharing reminders
     void shareReminder(){
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
-        sendIntent.setType("text/plain");
-        startActivity(sendIntent);
+        String fileName = image;
+        String externalStorageDirectory = Environment.getExternalStorageDirectory().toString();//getting the directory name
+        Uri uri = Uri.parse("file:///"+externalStorageDirectory+"/"+fileName);
+        /*Intent sendIntent = new Intent(android.content.Intent.ACTION_SEND);
+        Toast.makeText(getApplicationContext(),"IMAGE PATH IS "+uri.toString(),Toast.LENGTH_LONG).show();
+        sendIntent.setType("text/html");
+        sendIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Test Mail");
+        sendIntent.putExtra(android.content.Intent.EXTRA_TEXT,"Hi, I visited "+name+" to "+title);
+        sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        startActivity(Intent.createChooser(sendIntent, "Share Deal"));*/
+        Toast.makeText(getApplicationContext(),"Image is "+image+" with uri "+uri,Toast.LENGTH_LONG).show();
+        if(!image.equals("")) {
+            Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+            sharingIntent.setType("image/png");
+            sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
+            if((!name.equals("")) && (!address.equals(""))) {
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "I visited " + name + " to " + title);//this is yet to be checked
+            }
+            startActivity(Intent.createChooser(sharingIntent, "Share reminder using"));
+        }
+        else if(image==null)
+        {
+            Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "I visited ");
+            sharingIntent.setType("text/plain");
+            startActivity(sharingIntent);
+        }
+        //startActivity(Intent.createChooser(sendIntent, "Share Deal"));
+        //sendIntent.setAction(Intent.ACTION_SEND);
+        //sendIntent.putExtra(Intent.EXTRA_TEXT,title+"\n"+address+"\n"+name);
+        //sendIntent.putExtra(Intent.EXTRA_STREAM, image);
+        //sendIntent.setType("text/plain");
+        //sendIntent.setType("*/*");
+        //sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        //startActivity(sendIntent);
     }
-
 }
 
