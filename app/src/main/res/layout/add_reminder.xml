@@ -6,7 +6,7 @@
     android:fillViewport="true">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:id="@+id/linear_layout"
             android:focusable="true"
@@ -17,7 +17,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_margin="@dimen/cardview_default_elevation">
+                android:layout_margin="@dimen/cardview_default_elevation"
+                android:padding="15dp">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -39,35 +40,57 @@
                     android:inputType="textAutoCorrect"
                     android:contentDescription="Enter title for your reminder"
                     />
-
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
                 <RadioGroup
-                    android:id="@+id/radioSex"
+                    android:id="@+id/radioGenSpec"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
-
                     <RadioButton
                         android:id="@+id/general"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="General"
                         android:checked="true" />
-
                     <RadioButton
                         android:id="@+id/specific"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Specific Type" />
-
+                        android:text="Specific" />
                 </RadioGroup>
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Select Location"
-                    android:id="@+id/location_button"
-                    android:theme="@style/AppTheme.Button"
-                    android:layout_gravity="center_horizontal"/>
+                    <Button
+                        android:id="@+id/button1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="22dp"
+                        android:text="Select Type"
+                        android:layout_alignParentTop="true"
+                        android:theme="@style/AppTheme.Button"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginStart="22dp" />
+                </LinearLayout>
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select Location"
+                android:id="@+id/location_button"
+                android:layout_marginLeft="21dp"
+                android:theme="@style/AppTheme.Button"
+                    android:clickable="true"
+                    android:enabled="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="21dp"
+                    android:visibility="gone"/>
+            </RelativeLayout>
                 <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -79,7 +102,8 @@
         android:layout_margin="12dp"
         android:textStyle="bold"
         android:textSize="@dimen/abc_action_bar_content_inset_material"
-        android:textColor="#000"/>
+        android:textColor="#000"
+                    android:visibility="gone"/>
 
                 <EditText
                     android:id="@+id/place_name_edittext"
@@ -88,7 +112,8 @@
                     android:inputType="textAutoCorrect"
                     android:textSize="20sp"
                     android:enabled="true"
-                    android:clickable="true"/>
+                    android:clickable="true"
+                    android:visibility="gone"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -101,6 +126,7 @@
         android:textStyle="bold"
         android:textSize="@dimen/abc_action_bar_content_inset_material"
         android:textColor="#000"
+        android:visibility="gone"
         />
     <EditText
         android:id="@+id/place_address_edittext"
@@ -109,7 +135,8 @@
         android:inputType="textAutoCorrect"
         android:textSize="20sp"
         android:enabled="true"
-        android:clickable="false"/>
+        android:clickable="false"
+        android:visibility="gone"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -121,7 +148,8 @@
         android:layout_margin="12dp"
         android:textStyle="bold"
         android:textSize="@dimen/abc_action_bar_content_inset_material"
-        android:textColor="#000" />
+        android:textColor="#000"
+        />
     <EditText
         android:id="@+id/end_date_edittext"
         android:layout_width="match_parent"
@@ -135,7 +163,8 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="190dp">
+                android:layout_height="190dp"
+                android:padding="15dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -146,22 +175,12 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Options"
+                        android:text="Attachments"
                         android:id="@+id/options"
                         android:textStyle="bold"
                         android:textSize="@dimen/abc_action_bar_content_inset_material"
                         android:textColor="#000" />
 
-                </LinearLayout>
-                <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:id="@+id/linearLayout">
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/pasteImage"/>
                 </LinearLayout>
 
                 <Button
@@ -169,31 +188,26 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Save"
+                    android:theme="@style/AppTheme.Button"
                     android:layout_alignParentBottom="true"
-                    android:layout_toRightOf="@+id/imageButton"
-                    android:layout_toEndOf="@+id/imageButton"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginStart="30dp"
-                    android:theme="@style/AppTheme.Button"/>
+                    android:layout_toLeftOf="@+id/cancel_button"
+                    android:layout_toStartOf="@+id/cancel_button" />
                 <Button
                     android:id="@+id/cancel_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Cancel"
-                    android:layout_alignParentBottom="true"
-                    android:layout_toRightOf="@+id/contacts_text"
-                    android:layout_toEndOf="@+id/contacts_text"
-                    android:theme="@style/AppTheme.Button"/>
-
+                    android:theme="@style/AppTheme.Button"
+                    android:layout_below="@+id/pasteImage"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
 
                 <ImageView
                     android:id="@+id/imageIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/contacts"
-                    android:layout_below="@+id/linearLayout2"
-                    android:layout_toRightOf="@+id/linearLayout"
-                    android:layout_toEndOf="@+id/linearLayout"/>
+                    android:layout_below="@+id/linearLayout2" />
 
                 <ImageView
                     android:id="@+id/capture"
@@ -201,19 +215,17 @@
                     android:layout_height="wrap_content"
                     android:src="@drawable/captureimage"
                     android:visibility="visible"
-                    android:layout_below="@+id/imageIcon"
+                    android:layout_above="@+id/save_button"
                     android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"/>
+                    android:layout_alignParentStart="true" />
 
                 <EditText
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/contacts_text"
-                    android:layout_alignBottom="@+id/imageIcon"
-                    android:layout_toRightOf="@+id/save_button"
-                    android:layout_toEndOf="@+id/save_button"
-                    android:layout_marginLeft="27dp"
-                    android:layout_marginStart="27dp"/>
+                    android:layout_above="@+id/capture"
+                    android:layout_toRightOf="@+id/pasteImage"
+                    android:layout_toEndOf="@+id/pasteImage" />
 
                 <ImageButton
                     android:layout_width="40dp"
@@ -223,7 +235,15 @@
                     android:layout_below="@+id/capture"
                     android:layout_alignRight="@+id/capture"
                     android:layout_alignEnd="@+id/capture"/>
-            </RelativeLayout>
 
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:id="@+id/pasteImage"
+                    android:layout_above="@+id/save_button"
+                    android:layout_centerHorizontal="true" />
+            </RelativeLayout>
+ >
         </LinearLayout>
+
     </ScrollView>

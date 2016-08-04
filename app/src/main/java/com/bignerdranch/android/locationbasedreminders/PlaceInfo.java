@@ -10,13 +10,17 @@ public class PlaceInfo implements Comparable<PlaceInfo>{
     protected float ratings;
     protected boolean open_now;
     protected int price_level;
+    protected double latitude;
+    protected double longitude;
 
-    public PlaceInfo(String title, String address, float ratings, boolean open_now, int price_level){
+    public PlaceInfo(String title, String address, float ratings, boolean open_now, int price_level,double latitude,double longitude){
         this.title=title;
         this.address=address;
         this.ratings=ratings;
         this.open_now=open_now;
         this.price_level=price_level;
+        this.latitude=latitude;
+        this.longitude=longitude;
     }
 
     public float getRatings() {
@@ -31,6 +35,10 @@ public class PlaceInfo implements Comparable<PlaceInfo>{
             return -1;
         else
             return 0;
+    }
+
+    public String fullString(){
+        return title+" "+address+" "+ratings+" "+latitude+" "+longitude;
     }
 }
 
