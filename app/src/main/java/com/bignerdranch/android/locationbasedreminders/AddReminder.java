@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -26,8 +27,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +38,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -57,6 +61,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -82,7 +87,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     private EditText mDateEditText;
     private String[] contactList;
     private ImageView contactsText;
-    private LinearLayout loadingSection=null;
+
     private String[] nameNumberArray;
     private EditText selectedContact;
     private ImageView selectedImage;
@@ -102,16 +107,61 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     private String imageName;
     private Bitmap imageBitmap;
     private Button button1;
-    private String placeType;
-    private static double currentLatitude;
-    private static double currentLongitude;
-    private LatLng fromPosition;
-    protected LocationManager locationManager;
-    private RadioGroup mRadioGroup;
+  //  private String placeType;
+    private ImageButton imgButton;
+    private String m_Text;
+    //  private static double currentLatitude;
+  //  private static double currentLongitude;
+  //  private LatLng fromPosition;
+  //  protected LocationManager locationManager;
+  //  private RadioGroup mRadioGroup;
     private String mDropDownSelectedType;
-    private GoogleApiClient mGoogleApiClient;
+ //   private GoogleApiClient mGoogleApiClient;
     private RadioButton mGeneralRadioButton;
     private RadioButton mSpecificRadioButton;
+    private static final String GOOGLE_API_KEY = "AIzaSyDPCg0_ZB96tWAt5-7EaCsanrrLiLtwpaY";
+
+    private Intent serviceIntent;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_items,menu);
+        return true;
+    }
+    //--------------------------
+    public void startService(View view, boolean power) {
+        serviceIntent = new Intent(getApplicationContext(), LocationService.class);
+        if(power){
+            serviceIntent.putExtra("powerMode", "yes");
+        }
+        startService(serviceIntent);
+
+    }
+
+
+    public void stopService(View view){
+        if(serviceIntent!=null){
+            stopService(new Intent(this,LocationService.class));
+        }
+    }
+    //-----------------------------
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        item.setChecked(true);
+        int id=item.getItemId();
+        if(id==R.id.enable_service) {
+            startService(getCurrentFocus(),false);
+            // return true;
+        }
+        else if(id==R.id.diable_service){
+            stopService(getCurrentFocus());
+            // return true;
+        }
+        else if(id==R.id.power_saver){
+            startService(getCurrentFocus(),true);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,7 +211,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                 popup.show(); //showing popup menu
             }
         }); //closing the setOnClickListener method
-        if (mGoogleApiClient == null) {
+     /*   if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
@@ -192,7 +242,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                     mAddressText.setVisibility(View.VISIBLE);
                 }
             }
-        });
+        });*/
 
         selectedImage=(ImageView) findViewById(R.id.capture);
         if(getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
@@ -226,8 +276,8 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         mDateEditText = (EditText) findViewById(R.id.end_date_edittext);
         mSaveButton = (Button) findViewById(R.id.save_button);
         mDateEditText.setOnClickListener(this);
-        mGeneralRadioButton=(RadioButton)findViewById(R.id.general);
-        mSpecificRadioButton=(RadioButton)findViewById(R.id.specific);
+    //    mGeneralRadioButton=(RadioButton)findViewById(R.id.general);
+     //   mSpecificRadioButton=(RadioButton)findViewById(R.id.specific);
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 createReminder();
@@ -240,6 +290,32 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
             }
         });
 
+        imgButton =(ImageButton)findViewById(R.id.imageButton);
+        imgButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Toast.makeText(getApplicationContext(),"You download is resumed",Toast.LENGTH_LONG).show();
+                AlertDialog.Builder builder = new AlertDialog.Builder(AddReminder.this);
+                builder.setTitle("Add a note");
+                final EditText input = new EditText(AddReminder.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        m_Text = input.getText().toString();
+                        Toast.makeText(getApplicationContext(),"Your note has been saved",Toast.LENGTH_LONG).show();
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
+            }
+        });
         if(getIntent().getExtras()!=null)
         {
             sharedPreferences = getSharedPreferences("shared", MODE_PRIVATE);
@@ -247,11 +323,15 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
             String placeAddress = sharedPreferences.getString("Place Address", null);
             String placeName=sharedPreferences.getString("Place name",null);
             String endDate=sharedPreferences.getString("End date",null);
-            placeType=sharedPreferences.getString("placeType",null);
-            mGeneralRadioButton.setChecked(sharedPreferences.getBoolean("mGeneralRadioButton",false));
-            mSpecificRadioButton.setChecked(sharedPreferences.getBoolean("mSpecificRadioButton",false));
+         //   placeType=sharedPreferences.getString("placeType",null);
+//            mGeneralRadioButton.setChecked(sharedPreferences.getBoolean("mGeneralRadioButton",false));
+  //          mSpecificRadioButton.setChecked(sharedPreferences.getBoolean("mSpecificRadioButton",false));
             mDropDownSelectedType=sharedPreferences.getString(mDropDownSelectedType,null);
-            button1.setText(mDropDownSelectedType);
+            if(mDropDownSelectedType!=null){
+                button1.setText(mDropDownSelectedType);
+            }
+            m_Text=sharedPreferences.getString("m_Text",null);
+
             Log.d("Display","Title is "+title);
             Log.d("Display","Address is "+placeAddress);
             Log.d("Display","Name is "+placeName);
@@ -267,7 +347,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
             if(p.getString("placeName")!=null){
                 placeName=p.getString("placeName");
                 placeAddress=p.getString("placeAddress");
-                placeType=p.getString("placeType");
+               // placeType=p.getString("placeType");
                 lat=p.getDouble("lat");
                 lng=p.getDouble("lng");
             }
@@ -278,15 +358,6 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         }
         updateBarHandler =new Handler();
 
-
-
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_sub,menu);
-        return true;
     }
 
     private void dispatchTakePictureIntent() {
@@ -354,18 +425,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         df.setTimeZone(TimeZone.getDefault());
         mDateEditText.setText(df.format(myCalendar.getTime()));
     }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        int id=item.getItemId();
-        if(id==R.id.enable_service) {
-            return true;
-        }
-       if(id==android.R.id.home) {
 
-       }
-        return super.onOptionsItemSelected(item);
-    }
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
 
@@ -376,10 +436,11 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         editor.putString("Place Address",mAddressEditText.getText().toString());
         editor.putString("Place name",mNameEditText.getText().toString());
         editor.putString("End date",mDateEditText.getText().toString());
-        editor.putString("placeType",placeType);
-        editor.putString("mDropDownSelectedType",mDropDownSelectedType);
-        editor.putBoolean("mGeneralRadioButton",mGeneralRadioButton.isChecked());
-        editor.putBoolean("mSpecificRadioButton",mSpecificRadioButton.isChecked());
+      //  editor.putString("placeType",placeType);
+        editor.putString("mDropDownSelectedType",button1.getText().toString());
+        editor.putString("m_Text",m_Text);
+    //    editor.putBoolean("mGeneralRadioButton",mGeneralRadioButton.isChecked());
+     //   editor.putBoolean("mSpecificRadioButton",mSpecificRadioButton.isChecked());
         editor.commit();
         super.onSaveInstanceState(savedInstanceState);
 
@@ -465,7 +526,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         }
     }
     private void createReminder() {
-        if (mRadioGroup.getCheckedRadioButtonId()==R.id.general) {
+      /*  if (mRadioGroup.getCheckedRadioButtonId()==R.id.general) {
             if(mDropDownSelectedType==null){
                 Toast.makeText(getApplicationContext(), "Enter a type of place", Toast.LENGTH_SHORT).show();
             }else{
@@ -502,76 +563,14 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                     createGeneral(mLocation);
                 }
             }
-        } else {
+        } else {*/
             createSpecific();
-        }
+      //  }
     }
-    private void createGeneral(Location mLocation){
+  /*  private void createGeneral(Location mLocation){
         nearBySearch(new LatLng(mLocation.getLatitude(),mLocation.getLongitude()),mDropDownSelectedType);
-        if(temp!=null){
 
-            Log.e("title",mTitleEditText.toString());
-            Log.e("date",mDateEditText.toString());
-            if (!mTitleEditText.getText().toString().equals("") &&! mDateEditText.getText().toString().equals("") ) {
-                if (imageName != null) {
-                    if (saveImage(imageName, imageBitmap)) {
-                        Toast.makeText(getApplicationContext(), "Image Saved", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                SQLiteDatabase db = openOrCreateDatabase("LocationBasedReminders", MODE_PRIVATE, null);
-                db.execSQL("CREATE TABLE IF NOT EXISTS Reminder( _id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                        "title VARCHAR, name VARCHAR, address VARCHAR, date VARCHAR, latitude REAL, longitude REAL, status BOOLEAN,contact VARCHAR,image VARCHAR );");
-                ContentValues values = new ContentValues();
-                values.put("title", mTitleEditText.getText().toString());
-                values.put("name","");
-                values.put("address","");
-                values.put("date",mDateEditText.getText().toString());
-                values.put("latitude",0);
-                values.put("longitude",0);
-                values.put("status",false);
-                if(selectedContact!=null){
-                    values.put("contact",selectedContact.getText().toString());
-                }
-                if(imageName!=null){
-                    values.put("image",imageName);
-                }
-                long id=db.insert("Reminder", null, values);
-                Log.e("id","inserted id is"+id);
-                //----------------------------------------------------------------------------------
-                int i=0;
-                for(PlaceInfo placeInfo:temp){
-                    if(i>=4){
-                        break;
-                    }
-                    else{
-                        values=new ContentValues();
-                        values.put("title", mTitleEditText.getText().toString());
-                        values.put("name",placeInfo.title);
-                        values.put("address",placeInfo.address);
-                        values.put("date",mDateEditText.getText().toString());
-                        values.put("latitude",placeInfo.latitude);
-                        values.put("longitude",placeInfo.longitude);
-                        values.put("status",false);
-                        values.put("reminderid",id);
-                        db.insert("Location", null, values);
-                        Log.d("info",placeInfo.fullString());
-                    }
-                    i++;
-                }
-
-                Toast.makeText(getApplicationContext(), "Added to visit List", Toast.LENGTH_SHORT).show();
-                 startActivity(new Intent(this, MainActivity.class));
-            } else {
-                LinearLayout linearLayout = (LinearLayout) findViewById(R.id.linear_layout);
-                Snackbar.make(linearLayout, "Fields cannot be empty(Generally)", Snackbar.LENGTH_SHORT)
-                        .setActionTextColor(Color.RED)
-                        .show();
-            }
-
-        }else{
-            Log.e("error","google search returned no records");
-        }
-    }
+    }*/
 
    private void createSpecific(){
        SQLiteDatabase db = openOrCreateDatabase("LocationBasedReminders", MODE_PRIVATE, null);
@@ -582,10 +581,12 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                    Toast.makeText(getApplicationContext(), "Image Saved", Toast.LENGTH_SHORT).show();
                }
            }
+
+           String address=mAddressEditText.getText().toString().replace("'","\'");
            db.execSQL("CREATE TABLE IF NOT EXISTS Reminder( _id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                   "title VARCHAR, name VARCHAR, address VARCHAR, date VARCHAR, latitude REAL, longitude REAL, status BOOLEAN,contact VARCHAR,image VARCHAR );");
-           db.execSQL("INSERT INTO Reminder(title, name, address, date, latitude, longitude, status, contact, image ) VALUES('" + mTitleEditText.getText().toString() + "', '" + mNameEditText.getText().toString() + "'," +
-                   "'" + mAddressEditText.getText().toString() + "', '" + mDateEditText.getText().toString() + "','" + lat + "','" + lng + "','" + false + "','" + selectedContact.getText() + "','" + imageName + "');");
+                   "title VARCHAR, name VARCHAR, address VARCHAR, date VARCHAR, latitude REAL, longitude REAL, status BOOLEAN,contact VARCHAR,image VARCHAR, type VARCHAR , note VARCHAR);");
+           db.execSQL("INSERT INTO Reminder(title, name, address, date, latitude, longitude, status, contact, image, type, note ) VALUES('" + mTitleEditText.getText().toString() + "', '" + mNameEditText.getText().toString() + "'," +
+                   "'" + address + "', '" + mDateEditText.getText().toString() + "','" + lat + "','" + lng + "','" + false + "','" + selectedContact.getText() + "','" + imageName + "','"+mDropDownSelectedType+"','"+m_Text+"');");
            Toast.makeText(getApplicationContext(), "Added to visit List", Toast.LENGTH_SHORT).show();
            startActivity(new Intent(this, MainActivity.class));
 
@@ -620,7 +621,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     }
 
 
-
+/*----------------------------------------
     public void nearBySearch(LatLng selectedLocation, String type)  {
         //Toast.makeText(this, "inside neAR by search",Toast.LENGTH_LONG).show();
         String type_general=type;
@@ -640,7 +641,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         searchString.append("&radius=" + 12000);
         searchString.append("&keyword="+ type );
         searchString.append("&sensor=false");
-        searchString.append("&key=AIzaSyB2LUqKQxUvBIqCYLR4VDZpVNdRf-DACg4");
+        searchString.append("&key="+GOOGLE_API_KEY);
         Log.v("URL",searchString.toString());
         return searchString;
     }
@@ -698,10 +699,78 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
                 temp.add(new PlaceInfo(placeName,address,ratings,open_now,price_level,latitude,longitude));
                 Log.d("Display","PLACE NAME IS "+placeName);
             }
-            PlacesSorter s=new PlacesSorter(temp);
-            temp=s.getSortedByRatings();
+            Log.e("shikha",temp.size()+"length b4 sorting");
+            Collections.sort(temp);
+
+            Log.e("shikha",temp.size()+"length after sorting");
+            if(temp!=null){
+
+                Log.e("title",mTitleEditText.toString());
+                Log.e("date",mDateEditText.toString());
+                if (!mTitleEditText.getText().toString().equals("") &&! mDateEditText.getText().toString().equals("") ) {
+                    if (imageName != null) {
+                        if (saveImage(imageName, imageBitmap)) {
+                            Toast.makeText(getApplicationContext(), "Image Saved", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    SQLiteDatabase db = openOrCreateDatabase("LocationBasedReminders", MODE_PRIVATE, null);
+
+                    db.execSQL("CREATE TABLE IF NOT EXISTS Reminder( _id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                            "title VARCHAR, name VARCHAR, address VARCHAR, date VARCHAR, latitude REAL, longitude REAL, status BOOLEAN,contact VARCHAR,image VARCHAR );");
+                    db.execSQL("CREATE TABLE IF NOT EXISTS Location( _id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                            "reminderid INTEGER, title VARCHAR, name VARCHAR, address VARCHAR, date VARCHAR, latitude REAL, longitude REAL, status BOOLEAN );");
+                    ContentValues values = new ContentValues();
+                    values.put("title", mTitleEditText.getText().toString());
+                    values.put("name","");
+                    values.put("address","");
+                    values.put("date",mDateEditText.getText().toString());
+                    values.put("latitude",0);
+                    values.put("longitude",0);
+                    values.put("status",false);
+                    if(selectedContact!=null){
+                        values.put("contact",selectedContact.getText().toString());
+                    }
+                    if(imageName!=null){
+                        values.put("image",imageName);
+                    }
+                    long id=db.insert("Reminder", null, values);
+                    Log.e("id","inserted id is"+id);
+                    //----------------------------------------------------------------------------------
+                    int i=0;
+                    for(PlaceInfo placeInfo:temp){
+                        if(i>4){
+                            break;
+                        }
+                        else{
+                            values=new ContentValues();
+                            values.put("title", mTitleEditText.getText().toString());
+                            values.put("name",placeInfo.title);
+                            values.put("address",placeInfo.address);
+                            values.put("date",mDateEditText.getText().toString());
+                            values.put("latitude",placeInfo.latitude);
+                            values.put("longitude",placeInfo.longitude);
+                            values.put("status",false);
+                            values.put("reminderid",id);
+                            db.insert("Location", null, values);
+                            Log.d("info",placeInfo.fullString());
+                        }
+                        i++;
+                    }
+
+                    Toast.makeText(getApplicationContext(), "Added to visit List", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(getApplication(), MainActivity.class));
+                } else {
+                    LinearLayout linearLayout = (LinearLayout) findViewById(R.id.linear_layout);
+                    Snackbar.make(linearLayout, "Fields cannot be empty(Generally)", Snackbar.LENGTH_SHORT)
+                            .setActionTextColor(Color.RED)
+                            .show();
+                }
+
+            }else{
+                Log.e("error","google search returned no records");
+            }
 
         }
-    }
+    }*/
 
 }

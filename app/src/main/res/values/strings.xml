@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Location Based Reminders</string>
+    <string name="app_name">VisitTrack</string>
     <string name="next">next</string>
     <string-array name="tabs">
         <item>Your Reminders</item>

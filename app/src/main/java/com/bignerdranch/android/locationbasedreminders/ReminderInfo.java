@@ -15,8 +15,9 @@ public class ReminderInfo implements Comparable<ReminderInfo> {
     protected double longitude;
     protected Date date;
     protected boolean status;
+    protected String type;
 
-    public ReminderInfo(int id,String title, String name, String address, float latitude, float longitude, Date date,boolean status) {
+    public ReminderInfo(int id,String title, String name, String address, float latitude, float longitude, Date date,boolean status,String type) {
         this.id=id;
         this.title = title;
         this.name=name;
@@ -25,6 +26,7 @@ public class ReminderInfo implements Comparable<ReminderInfo> {
         this.longitude=longitude;
         this.date=date;
         this.status=status;
+        this.type=type;
     }
 
     public Date getDate() {

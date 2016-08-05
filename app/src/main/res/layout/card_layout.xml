@@ -8,19 +8,17 @@
     android:layout_margin="1dp"
     android:clickable="true">
     <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:visibility="visible"
-        android:layout_marginLeft="5dp"
-        android:id="@+id/circleView"/>
+        android:id="@+id/typeImage"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/grocery"
+        android:layout_marginTop="25dp"
+        />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:nestedScrollingEnabled="true"
+        android:nestedScrollingEnabled="false"
         android:layout_marginLeft="50dp">
         <ImageButton
             android:layout_width="20dp"
@@ -42,7 +40,8 @@
             android:textSize="16dp"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="5dp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:paddingLeft="20dp"/>
         <TextView
             android:id="@+id/name"
             android:layout_width="wrap_content"

@@ -49,6 +49,22 @@ public class ReminderInfoAdapter extends RecyclerView.Adapter<ReminderInfoAdapte
         placeViewHolder.vTitle.setText(ci.title);
         placeViewHolder.vAddress.setText(ci.address);
         placeViewHolder.vName.setText(ci.name);
+
+        if(ci.type.equals("Grocery")){
+            placeViewHolder.vTypeImage.setImageResource(R.drawable.grocery);
+        }else if(ci.type.equals("ATM")){
+            placeViewHolder.vTypeImage.setImageResource(R.drawable.atm);
+        }else if(ci.type.equals("Gas")){
+            placeViewHolder.vTypeImage.setImageResource(R.drawable.gas);
+        }else if(ci.type.equals("Medicine")){
+            placeViewHolder.vTypeImage.setImageResource(R.drawable.medicine);
+        }else{
+            placeViewHolder.vTypeImage.setImageResource(R.drawable.pin_icon);
+        }
+
+
+
+
         //TODO Format Date
         DateFormat df =new SimpleDateFormat("MMMM dd, yyyy",Locale.US);
         df.setTimeZone(TimeZone.getDefault());
@@ -61,8 +77,12 @@ public class ReminderInfoAdapter extends RecyclerView.Adapter<ReminderInfoAdapte
                 public void onClick(View v) {
                     ReminderDbAdapter dbAdapter=new ReminderDbAdapter(v.getContext());
                     dbAdapter.markAsDone(ci.id);
+            //        v.getContext().stopService(new Intent(v.getContext(),LocationService.class));
+             //       v.getContext().startService(new Intent(v.getContext(),LocationService.class));
+                    Intent intent=new Intent(v.getContext(),MainActivity.class);
+                    intent.putExtra("checkService","check");
                     Toast.makeText(v.getContext().getApplicationContext(), "Reminder Marked as done", Toast.LENGTH_LONG).show();
-                    v.getContext().startActivity(new Intent(v.getContext(),MainActivity.class));
+                    v.getContext().startActivity(intent);
                 }
             });
         }
@@ -74,8 +94,13 @@ public class ReminderInfoAdapter extends RecyclerView.Adapter<ReminderInfoAdapte
                 public void onClick(View v) {
                     ReminderDbAdapter dbAdapter=new ReminderDbAdapter(v.getContext());
                     dbAdapter.undo(ci.id);
+               //     v.getContext().stopService(new Intent(v.getContext(),LocationService.class));
+               //     v.getContext().startService(new Intent(v.getContext(),LocationService.class));
                     Toast.makeText(v.getContext().getApplicationContext(), "Undo", Toast.LENGTH_LONG).show();
-                    v.getContext().startActivity(new Intent(v.getContext(),MainActivity.class));
+                    Intent intent=new Intent(v.getContext(),MainActivity.class);
+                    intent.putExtra("checkService","check");
+                    Toast.makeText(v.getContext().getApplicationContext(), "Undo Reminder", Toast.LENGTH_LONG).show();
+                    v.getContext().startActivity(intent);
                 }
             });
         }
@@ -86,8 +111,12 @@ public class ReminderInfoAdapter extends RecyclerView.Adapter<ReminderInfoAdapte
             public void onClick(View v) {
                 ReminderDbAdapter dbAdapter=new ReminderDbAdapter(v.getContext());
                 dbAdapter.deleteReminder(ci.id);
+           //     v.getContext().stopService(new Intent(v.getContext(),LocationService.class));
+            //    v.getContext().startService(new Intent(v.getContext(),LocationService.class));
                 Toast.makeText(v.getContext().getApplicationContext(), "Reminder deleted", Toast.LENGTH_LONG).show();
-                v.getContext().startActivity(new Intent(v.getContext(),MainActivity.class));
+                Intent intent=new Intent(v.getContext(),MainActivity.class);
+                intent.putExtra("checkService","check");
+                v.getContext().startActivity(intent);
 
             }
         });
@@ -119,6 +148,7 @@ public class ReminderInfoAdapter extends RecyclerView.Adapter<ReminderInfoAdapte
         protected ImageButton vDeleteButton;
         protected Button vDoneButton;
         protected Button vUndoButton;
+        protected ImageView vTypeImage;
 
 
         public PlaceViewHolder(View v){
@@ -130,6 +160,8 @@ public class ReminderInfoAdapter extends RecyclerView.Adapter<ReminderInfoAdapte
             vDeleteButton=(ImageButton) v.findViewById(R.id.deleteButton);
             vDoneButton=(Button) v.findViewById(R.id.doneButton);
             vUndoButton=(Button)v.findViewById(R.id.undoButton);
+            vTypeImage= (ImageView) v.findViewById(R.id.typeImage);
+
         }
     }
 }

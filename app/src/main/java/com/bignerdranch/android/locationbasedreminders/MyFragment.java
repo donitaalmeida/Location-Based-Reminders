@@ -29,7 +29,7 @@ public  class MyFragment extends Fragment {
 
 
     private ArrayList<ReminderInfo> getRecyclerViewData(int position) {
-        String title, name, address;
+        String title, name, address, type;
         float latitude, longitude;
         Date date;
         int id;
@@ -38,37 +38,38 @@ public  class MyFragment extends Fragment {
         dbHelper=new ReminderDbAdapter(getActivity().getBaseContext());
         dbHelper.open();
         Cursor cursor = dbHelper.fetchAllReminders();
-        if (cursor.moveToFirst()){
-            do{
-                status=new Boolean(cursor.getString(cursor.getColumnIndex("status")));
-                if(position==0){
-                    status=!status;
-                }
-                if(status){
-                    title = cursor.getString(cursor.getColumnIndex("title"));
-                    name = cursor.getString(cursor.getColumnIndex("name"));
-                    address = cursor.getString(cursor.getColumnIndex("address"));
-                    latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
-                    longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
-                    DateFormat formatter = new SimpleDateFormat("MMMM dd, yyyy",Locale.US);
-                    formatter.setTimeZone(TimeZone.getDefault());
-                    Log.e("donita",TimeZone.getDefault().getDisplayName());
-                    try {
-                        Log.e("date","1"+cursor.getString(cursor.getColumnIndex("date"))+"1");
-
-                        date = formatter.parse(cursor.getString(cursor.getColumnIndex("date")));
-
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                        date=new Date();
+            if(cursor.moveToFirst()) {
+                do {
+                    status = new Boolean(cursor.getString(cursor.getColumnIndex("status")));
+                    if (position == 0) {
+                        status = !status;
                     }
-                    id=cursor.getInt(cursor.getColumnIndex("_id"));
-                    status=new Boolean(cursor.getString(cursor.getColumnIndex("status")));
-                    reminderList.add(new ReminderInfo(id,title, name, address, latitude, longitude, date,status));
-                }
+                    if (status) {
+                        title = cursor.getString(cursor.getColumnIndex("title"));
+                        name = cursor.getString(cursor.getColumnIndex("name"));
+                        address = cursor.getString(cursor.getColumnIndex("address"));
+                        latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
+                        longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
+                        DateFormat formatter = new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
+                        formatter.setTimeZone(TimeZone.getDefault());
+                        type = cursor.getString(cursor.getColumnIndex("type"));
+                        Log.e("donita", TimeZone.getDefault().getDisplayName());
+                        try {
+                            Log.e("date", "1" + cursor.getString(cursor.getColumnIndex("date")) + "1");
 
-            }while(cursor.moveToNext());
-        }
+                            date = formatter.parse(cursor.getString(cursor.getColumnIndex("date")));
+
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                            date = new Date();
+                        }
+                        id = cursor.getInt(cursor.getColumnIndex("_id"));
+                        status = new Boolean(cursor.getString(cursor.getColumnIndex("status")));
+                        reminderList.add(new ReminderInfo(id, title, name, address, latitude, longitude, date, status, type));
+                    }
+
+                } while (cursor.moveToNext());
+            }
         cursor.close();
         dbHelper.close();
         return reminderList;
@@ -90,7 +91,7 @@ public  class MyFragment extends Fragment {
             llm.setOrientation(LinearLayoutManager.VERTICAL);
             recyclerView.setLayoutManager(llm);
             recyclerView.setAdapter(reminderInfoAdapter);
-            reminderList.clear();
+           // reminderList.clear();
             reminderInfoAdapter.notifyDataSetChanged();
             reminderList.addAll(getRecyclerViewData(bundle.getInt("position")));
                /* if(bundle.getInt("position")==0){

@@ -1,5 +1,7 @@
 package com.bignerdranch.android.locationbasedreminders;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -12,6 +14,8 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -40,8 +44,9 @@ public class ReminderDetailsActivity extends AppCompatActivity {
     private  ReminderDbAdapter dbHelper;
     private Button mClickButton;
     private ImageButton shareButton;
-    private Intent serviceIntent;
-    String title, name, address, image,contact;
+    private TextView mNote;
+
+    String title, name, address, image,contact,note;
     float latitude, longitude;
     String date;
     int id;
@@ -53,6 +58,48 @@ public class ReminderDetailsActivity extends AppCompatActivity {
    // private ImageView circularImage;
     private Bitmap imageBitmap;
     Uri targetUri;
+
+    private Intent serviceIntent;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_items,menu);
+        return true;
+    }
+    //--------------------------
+    public void startService(View view, boolean power) {
+        serviceIntent = new Intent(getApplicationContext(), LocationService.class);
+        if(power){
+            serviceIntent.putExtra("powerMode", "yes");
+        }
+        startService(serviceIntent);
+
+    }
+
+
+    public void stopService(View view){
+        if(serviceIntent!=null){
+            stopService(new Intent(this,LocationService.class));
+        }
+    }
+    //-----------------------------
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        item.setChecked(true);
+        int id=item.getItemId();
+        if(id==R.id.enable_service) {
+            startService(getCurrentFocus(),false);
+            // return true;
+        }
+        else if(id==R.id.diable_service){
+            stopService(getCurrentFocus());
+            // return true;
+        }
+        else if(id==R.id.power_saver){
+            startService(getCurrentFocus(),true);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -115,6 +162,16 @@ public class ReminderDetailsActivity extends AppCompatActivity {
                 stopService(serviceIntent);
             }
     }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,6 +198,8 @@ public class ReminderDetailsActivity extends AppCompatActivity {
             vAddress = (TextView) findViewById(R.id.address);
             vName = (TextView) findViewById(R.id.name);
             vDate = (TextView) findViewById(R.id.date);
+            mNote=(TextView)findViewById(R.id.note);
+
             vDeleteButton = (ImageButton) findViewById(R.id.deleteButton);
             vDoneButton = (Button) findViewById(R.id.doneButton);
             vUndoButton = (Button) findViewById(R.id.undoButton);
@@ -163,6 +222,9 @@ public class ReminderDetailsActivity extends AppCompatActivity {
                 if(cursor.getColumnIndex("contact")>=0){
                     contact=cursor.getString(cursor.getColumnIndex("contact"));
                 }
+                if(cursor.getColumnIndex("note")>0){
+                    note=cursor.getString(cursor.getColumnIndex("note"));
+                }
                 Log.e("title",title);
             }
             dbHelper.close();
@@ -171,6 +233,7 @@ public class ReminderDetailsActivity extends AppCompatActivity {
             vAddress.setText(address);
             vName.setText(name);
             vDate.setText(date);
+            mNote.setText(note);
             if(image!=null){
                 displayImage.setImageBitmap(getImageFromDevice(image));
                 //circularImage.setImageBitmap(getImageFromDevice(image));
@@ -191,9 +254,12 @@ public class ReminderDetailsActivity extends AppCompatActivity {
                 vDoneButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                            stopService();
+
                             dbHelper.markAsDone(id);
+                        if(isMyServiceRunning(LocationService.class)){
+                            stopService();
                             startService();
+                        }
                             Toast.makeText(v.getContext().getApplicationContext(), "Reminder Marked as done", Toast.LENGTH_LONG).show();
                             startActivity(new Intent(v.getContext(), MainActivity.class));
                     }
@@ -229,31 +295,24 @@ public class ReminderDetailsActivity extends AppCompatActivity {
 //Code for sharing reminders
     void shareReminder(){
         String fileName = image;
-        String externalStorageDirectory = Environment.getExternalStorageDirectory().toString();//getting the directory name
-        Uri uri = Uri.parse("file:///"+externalStorageDirectory+"/"+fileName);
-        /*Intent sendIntent = new Intent(android.content.Intent.ACTION_SEND);
-        Toast.makeText(getApplicationContext(),"IMAGE PATH IS "+uri.toString(),Toast.LENGTH_LONG).show();
-        sendIntent.setType("text/html");
-        sendIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Test Mail");
-        sendIntent.putExtra(android.content.Intent.EXTRA_TEXT,"Hi, I visited "+name+" to "+title);
-        sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        startActivity(Intent.createChooser(sendIntent, "Share Deal"));*/
-        Toast.makeText(getApplicationContext(),"Image is "+image+" with uri "+uri,Toast.LENGTH_LONG).show();
+        File f = new File(Environment.getExternalStorageDirectory()+"/"+fileName);
+        Uri uri = Uri.fromFile(f);
+        //Toast.makeText(getApplicationContext(),"Image is "+image+" with uri "+uri,Toast.LENGTH_LONG).show();
         if(!image.equals("")) {
             Intent sharingIntent = new Intent(Intent.ACTION_SEND);
             sharingIntent.setType("image/png");
             sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
             if((!name.equals("")) && (!address.equals(""))) {
-                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "I visited " + name + " to " + title);//this is yet to be checked
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "I visited " + name +"("+address+")"+ " to " + title);//this is yet to be checked
             }
             startActivity(Intent.createChooser(sharingIntent, "Share reminder using"));
         }
         else if(image==null)
         {
             Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "I visited ");
             sharingIntent.setType("text/plain");
-            startActivity(sharingIntent);
+            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "I visited ");
+            startActivity(Intent.createChooser(sharingIntent,"Share Reminders using"));
         }
         //startActivity(Intent.createChooser(sendIntent, "Share Deal"));
         //sendIntent.setAction(Intent.ACTION_SEND);

@@ -4,6 +4,8 @@ package com.bignerdranch.android.locationbasedreminders;
  * Created by shikh on 8/3/2016.
  */
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -17,6 +19,7 @@ public class PlacesSorter {
         mPlaceInfos=PlaceInfos;
     }
     public ArrayList<PlaceInfo> getSortedByRatings() {
+        Log.e("Shikha","length inside class sorter"+mPlaceInfos.size());
         Collections.sort(mPlaceInfos);
         return mPlaceInfos;
     }

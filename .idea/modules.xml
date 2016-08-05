@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Location-Based-Reminders.iml" filepath="$PROJECT_DIR$/Location-Based-Reminders.iml" />
       <module fileurl="file://$PROJECT_DIR$/LocationBasedReminders.iml" filepath="$PROJECT_DIR$/LocationBasedReminders.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>

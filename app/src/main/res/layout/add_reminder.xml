@@ -44,7 +44,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
-                <RadioGroup
+              <!--  <RadioGroup
                     android:id="@+id/radioGenSpec"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
@@ -59,7 +59,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Specific" />
-                </RadioGroup>
+                </RadioGroup>-->
 
                     <Button
                         android:id="@+id/button1"
@@ -89,7 +89,7 @@
                     android:enabled="true"
                     android:layout_alignParentTop="true"
                     android:layout_marginStart="21dp"
-                    android:visibility="gone"/>
+                    android:visibility="visible"/>
             </RelativeLayout>
                 <TextView
         android:layout_width="wrap_content"
@@ -103,7 +103,7 @@
         android:textStyle="bold"
         android:textSize="@dimen/abc_action_bar_content_inset_material"
         android:textColor="#000"
-                    android:visibility="gone"/>
+                    android:visibility="visible"/>
 
                 <EditText
                     android:id="@+id/place_name_edittext"
@@ -111,9 +111,10 @@
                     android:layout_height="wrap_content"
                     android:inputType="textAutoCorrect"
                     android:textSize="20sp"
-                    android:enabled="true"
+                    android:enabled="false"
                     android:clickable="true"
-                    android:visibility="gone"/>
+                    android:visibility="visible"
+                    />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -126,7 +127,7 @@
         android:textStyle="bold"
         android:textSize="@dimen/abc_action_bar_content_inset_material"
         android:textColor="#000"
-        android:visibility="gone"
+        android:visibility="visible"
         />
     <EditText
         android:id="@+id/place_address_edittext"
@@ -134,9 +135,10 @@
         android:layout_height="wrap_content"
         android:inputType="textAutoCorrect"
         android:textSize="20sp"
-        android:enabled="true"
+        android:enabled="false"
         android:clickable="false"
-        android:visibility="gone"/>
+        android:visibility="visible"
+       />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -158,7 +160,7 @@
         android:inputType="textAutoCorrect"
         android:focusable="false"
         android:clickable="false"
-        />
+        android:editable="false"/>
             </LinearLayout>
 
             <RelativeLayout

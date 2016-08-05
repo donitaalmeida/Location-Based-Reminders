@@ -19,5 +19,14 @@
         android:title="Disable Reminders"
         tools:ignore="AppCompatResource">
     </item>
+        <item
+            android:id="@+id/power_saver"
+            android:icon="@drawable/ic_launcher"
+            android:showAsAction="always"
+            android:orderInCategory="10"
+            android:title="Power saver"
+            tools:ignore="AppCompatResource">
+        </item>
+
     </group>
 </menu>

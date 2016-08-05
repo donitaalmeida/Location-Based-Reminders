@@ -18,6 +18,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -63,7 +65,48 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private PlaceAutocompleteFragment autocompleteFragment;
     private Place searchedPlace;
     private LinearLayout mLinearLayout;
+    private Intent serviceIntent;
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_items,menu);
+        return true;
+    }
+    //--------------------------
+    public void startService(View view, boolean power) {
+        serviceIntent = new Intent(getApplicationContext(), LocationService.class);
+        if(power){
+            serviceIntent.putExtra("powerMode", "yes");
+        }
+        startService(serviceIntent);
+
+    }
+
+
+    public void stopService(View view){
+        if(serviceIntent!=null){
+            stopService(new Intent(this,LocationService.class));
+        }
+    }
+//-----------------------------
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        item.setChecked(true);
+        int id=item.getItemId();
+        if(id==R.id.enable_service) {
+            startService(getCurrentFocus(),false);
+            // return true;
+        }
+        else if(id==R.id.diable_service){
+            stopService(getCurrentFocus());
+            // return true;
+        }
+        else if(id==R.id.power_saver){
+            startService(getCurrentFocus(),true);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -89,7 +132,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         }
-
     }
 
     private boolean checkGPSSensorPresent(){

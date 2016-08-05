@@ -19,7 +19,7 @@ public class ReminderDbAdapter
     private static final int DATABASE_VERSION = 1;
     private final Context mCtx;
     private static final String REMINDER_DATABASE_CREATE = "CREATE TABLE IF NOT EXISTS Reminder( _id INTEGER PRIMARY KEY AUTOINCREMENT," +
-            "title VARCHAR, name VARCHAR, address VARCHAR, date VARCHAR, latitude REAL, longitude REAL, status BOOLEAN, contact VARCHAR, image VARCHAR );";
+            "title VARCHAR, name VARCHAR, address VARCHAR, date VARCHAR, latitude REAL, longitude REAL, status BOOLEAN, contact VARCHAR, image VARCHAR, type VARCHAR, note VARCHAR );";
 
     private static final String LOCATION_DATABASE_CREATE="CREATE TABLE IF NOT EXISTS Location( _id INTEGER PRIMARY KEY AUTOINCREMENT," +
             "reminderid INTEGER, title VARCHAR, name VARCHAR, address VARCHAR, date VARCHAR, latitude REAL, longitude REAL, status BOOLEAN );";
@@ -31,7 +31,7 @@ public class ReminderDbAdapter
         @Override
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(REMINDER_DATABASE_CREATE);
-            db.execSQL(LOCATION_DATABASE_CREATE);
+         //   db.execSQL(LOCATION_DATABASE_CREATE);
         }
 
         @Override
@@ -59,7 +59,7 @@ public class ReminderDbAdapter
 
     public Cursor fetchAllReminders() {
         Cursor mCursor = mDb.query(SQLITE_TABLE, new String[] {
-                "_id", "title", "name", "address", "date","latitude","longitude","status"},
+                "_id", "title", "name", "address", "date","latitude","longitude","status","type","note"},
                 null, null, null, null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();

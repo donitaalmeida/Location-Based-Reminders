@@ -1,6 +1,9 @@
 package com.bignerdranch.android.locationbasedreminders;
 
 import android.*;
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -14,6 +17,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -57,9 +61,25 @@ public class MainActivity extends ActionBarActivity {
                     }
                 });
             }
+        }
+        if(getIntent().getStringExtra("checkService")!=null){
+            if(isMyServiceRunning(LocationService.class)){
+                stopService(getCurrentFocus());
+                startService(getCurrentFocus(),false);
+            }
 
         }
 
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
@@ -107,26 +127,37 @@ public class MainActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_items,menu);
         return true;
     }
-    public void startService(View view) {
-        serviceIntent = new Intent(this, LocationService.class);
+    //--------------------------
+    public void startService(View view, boolean power) {
+        serviceIntent = new Intent(getApplicationContext(), LocationService.class);
+        if(power){
+            serviceIntent.putExtra("powerMode", "yes");
+        }
         startService(serviceIntent);
+
     }
+
 
     public void stopService(View view){
         if(serviceIntent!=null){
-            stopService(serviceIntent);
+            stopService(new Intent(this,LocationService.class));
         }
     }
+//-----------------------------
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         item.setChecked(true);
         int id=item.getItemId();
         if(id==R.id.enable_service) {
-            startService(getCurrentFocus());
-            return true;
+            startService(getCurrentFocus(),false);
+           // return true;
         }
         else if(id==R.id.diable_service){
             stopService(getCurrentFocus());
+           // return true;
+        }
+        else if(id==R.id.power_saver){
+            startService(getCurrentFocus(),true);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -158,7 +189,7 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    public void startservice(View view) {
+    /*public void startservice(View view) {
         Location destination=new Location("");
         destination.setLatitude(37.33511);
         destination.setLongitude(-121.89102188);
@@ -166,7 +197,7 @@ public class MainActivity extends ActionBarActivity {
         intent.putExtra("destination", destination);
         startService(intent);
         stopService(intent);
-    }
+    }*/
 
 
 
