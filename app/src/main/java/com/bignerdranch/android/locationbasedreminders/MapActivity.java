@@ -325,6 +325,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             intent.putExtra("lng",searchedPlace.getLatLng().longitude);
             intent.putExtra("placeName",searchedPlace.getName().toString());
             intent.putExtra("placeAddress",searchedPlace.getAddress().toString());
+            intent.putExtra("placeType",searchedPlace.getPlaceTypes().get(0));
             startActivity(intent);
         }
         else{

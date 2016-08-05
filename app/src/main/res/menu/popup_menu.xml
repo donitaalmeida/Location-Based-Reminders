@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/one"
+        android:title="Grocery"/>
+
+    <item
+        android:id="@+id/two"
+        android:title="Medicine"/>
+
+    <item
+        android:id="@+id/three"
+        android:title="Gas Station"/>
+    <item
+        android:id="@+id/four"
+        android:title="ATM"/>
+    <item
+        android:id="@+id/five"
+        android:title="Others"/>
+
+</menu>

@@ -54,7 +54,11 @@ public class LocationService extends Service {
         mDbAdapter=new ReminderDbAdapter(this.getBaseContext());
         reminderList=new ArrayList<>();
         mDbAdapter.open();
-        Cursor cursor = mDbAdapter.fetchAllReminders();
+        addRemindersToService(mDbAdapter.fetchSpecificReminders());
+        addRemindersToService(mDbAdapter.fetchGeneralReminders());
+        mDbAdapter.close();
+    }
+    public void addRemindersToService(Cursor cursor){
         String title, name, address;
         float latitude, longitude;
         Date date;
@@ -84,13 +88,12 @@ public class LocationService extends Service {
                     id=cursor.getInt(cursor.getColumnIndex("_id"));
                     status=new Boolean(cursor.getString(cursor.getColumnIndex("status")));
                     reminderList.add(new ReminderInfo(id,title, name, address, latitude, longitude, date,status));
+                    Toast.makeText(getApplicationContext(),title+" added",Toast.LENGTH_LONG).show();
                 }
 
             }while(cursor.moveToNext());
         }
         cursor.close();
-        mDbAdapter.close();
-
     }
 
     @Override
@@ -104,7 +107,7 @@ public class LocationService extends Service {
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 60000, 0, listener);
        // mDestination = intent.getParcelableExtra("destination");
-        listener.startNotification("Started Listinig","Hi",intent);
+        listener.startNotification("VisitTrack is active","",intent);
     }
 
     @Override
@@ -162,18 +165,10 @@ public class LocationService extends Service {
         }
 
         public void startNotification(String title, String description, Intent intent){
-            try {
-                Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
-                r.play();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
             RemoteViews rmv = new RemoteViews(getPackageName(),R.layout.notification);
             PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), (int) System.currentTimeMillis(), intent, 0);
 
-            mBuilder =
-                    new NotificationCompat.Builder(LocationService.this)
+            mBuilder = new NotificationCompat.Builder(LocationService.this)
                             .setSmallIcon(R.mipmap.ic_launcher)
                             .setContentTitle(title)
                             .setContentText(description)
@@ -191,7 +186,13 @@ public class LocationService extends Service {
             stopForeground(true);
         }
         void sendNotification(String title, String description, int id){
-            //TODO change MainActivity to Reminder Details activity
+            try {
+                Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+                r.play();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             Intent intent = new Intent(getApplicationContext(),ReminderDetailsActivity.class);
             intent.putExtra("id",id);
             PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), (int) System.currentTimeMillis(), intent, 0);
