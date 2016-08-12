@@ -7,23 +7,24 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.bignerdranch.android.locationbasedreminders.MainActivity">
-    <LinearLayout
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
         <include android:id="@+id/app_bar" layout="@layout/app_bar"/>
         <com.bignerdranch.android.locationbasedreminders.SlidingTabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.3"
+            android:layout_marginTop="50dp"
             android:measureAllChildren="true"/>
+        <!--android:layout_weight="0.3"-->
         <android.support.v4.view.ViewPager
             android:id="@+id/pager"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2"/>
-
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+    />
+        <!--  android:layout_weight="2"-->
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="wrap_content"
@@ -38,5 +39,5 @@
             app:borderWidth="0dp"
             android:layout_gravity="bottom|right"/>
 
-    </LinearLayout>
+    </android.support.design.widget.CoordinatorLayout>
 </RelativeLayout>

@@ -37,8 +37,8 @@ public class PlaceInfo implements Comparable<PlaceInfo>{
             return 0;
     }
 
-    public String fullString(){
+  /*  public String fullString(){
         return title+" "+address+" "+ratings+" "+latitude+" "+longitude;
-    }
+    }*/
 }
 

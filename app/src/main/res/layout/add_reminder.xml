@@ -111,7 +111,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="textAutoCorrect"
                     android:textSize="20sp"
-                    android:enabled="false"
+                    android:enabled="true"
                     android:clickable="true"
                     android:visibility="visible"
                     />
@@ -135,7 +135,7 @@
         android:layout_height="wrap_content"
         android:inputType="textAutoCorrect"
         android:textSize="20sp"
-        android:enabled="false"
+        android:enabled="true"
         android:clickable="false"
         android:visibility="visible"
        />

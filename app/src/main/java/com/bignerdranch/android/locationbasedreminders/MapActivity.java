@@ -52,13 +52,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private LocationManager locManager;
     private GoogleMap mGoogleMap;
     private Toolbar toolbar;
-    private NavigationView navigationView;
-    private DrawerLayout drawerLayout;
-    private TextView mEmail;
+//    private NavigationView navigationView;
+ //   private DrawerLayout drawerLayout;
+  //  private TextView mEmail;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 125;
 
-    private static final String GOOGLE_API_KEY = "AIzaSyCPlTx3VCnAHgCmmUPidLL7_Jfu4ntJiqE";
-    private int PROXIMITY_RADIUS = 2400;
+   // private static final String GOOGLE_API_KEY = "AIzaSyCPlTx3VCnAHgCmmUPidLL7_Jfu4ntJiqE";
+   // private int PROXIMITY_RADIUS = 2400;
     private GoogleApiClient mGoogleApiClient;
     private Location mLocation;
     private Snackbar snackbarGpsNetwork = null;

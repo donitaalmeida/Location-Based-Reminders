@@ -133,14 +133,17 @@ public class MainActivity extends ActionBarActivity {
         if(power){
             serviceIntent.putExtra("powerMode", "yes");
         }
+        serviceIntent.addCategory("MyServiceTag");
         startService(serviceIntent);
 
     }
 
 
     public void stopService(View view){
+        serviceIntent = new Intent(getApplicationContext(), LocationService.class);
+        serviceIntent.addCategory("MyServiceTag");
         if(serviceIntent!=null){
-            stopService(new Intent(this,LocationService.class));
+            stopService(serviceIntent);
         }
     }
 //-----------------------------

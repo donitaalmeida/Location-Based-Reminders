@@ -39,7 +39,7 @@ import java.util.TimeZone;
 
 public class LocationService extends Service {
     public static final String BROADCAST_ACTION = "Hello World";
-    public static final String LOCATION_SERVICE = "it.unibz.bluedroid.bluetooth.service.LOCATION_SERVICE";
+    public static final String TAG = "MyServiceTag";
     private static final int ONE_MINUTES = 1000 * 60 * 1;
     private static final int FIVE_MINUTES = 1000 * 60 * 5;
 
@@ -50,14 +50,14 @@ public class LocationService extends Service {
     public Location previousBestLocation = null;
     private Location mDestination;
     Intent intent;
-    int counter = 0;
-    private boolean notify;
+  //  int counter = 0;
+   // private boolean notify;
     ReminderDbAdapter mDbAdapter;
     private ArrayList<ReminderInfo> reminderList;
     @Override
     public void onCreate() {
         super.onCreate();
-        notify=false;
+      //  notify=false;
         intent = new Intent(BROADCAST_ACTION);
 
         mDbAdapter=new ReminderDbAdapter(this.getBaseContext());
@@ -193,7 +193,7 @@ public class LocationService extends Service {
 
     }
 
-    public static Thread performOnBackgroundThread(final Runnable runnable) {
+  /*  public static Thread performOnBackgroundThread(final Runnable runnable) {
         final Thread t = new Thread() {
             @Override
             public void run() {
@@ -208,7 +208,7 @@ public class LocationService extends Service {
         return t;
 
 
-}
+}*/
     public class MyLocationListener implements LocationListener
     {
         private Notification mBuilder;
@@ -221,7 +221,7 @@ public class LocationService extends Service {
 
         public void startNotification(String title, String description, Intent intent){
           //  RemoteViews rmv = new RemoteViews(getPackageName(),R.layout.notification);
-            PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), (int) System.currentTimeMillis(), intent, 0);
+        //    PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), (int) System.currentTimeMillis(), intent, 0);
 
             mBuilder = new NotificationCompat.Builder(LocationService.this)
                             .setSmallIcon(R.mipmap.ic_launcher)
@@ -230,7 +230,7 @@ public class LocationService extends Service {
                         //    .setContent(rmv)
                             .build();
             NotificationManager notificationManager=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-          //  mBuilder.flags|=Notification.FLAG_AUTO_CANCEL;
+            mBuilder.flags|=Notification.FLAG_AUTO_CANCEL;
           //  rmv.setOnClickPendingIntent(R.id.disableButton, pIntent);
             notificationManager.notify(101,mBuilder);
             startForeground(101,mBuilder);
@@ -273,7 +273,7 @@ public class LocationService extends Service {
          //   intent.putExtra("Provider", loc.getProvider());
             float distance;
             Log.d("Display","Location changed");
-            int count=0;
+         //   int count=0;
 
             for(ReminderInfo reminderInfo: mReminderInfos){
                 Location destination=new Location(reminderInfo.name);

@@ -17,7 +17,7 @@ import java.util.Arrays;
  */
 public class DisplayContacts extends Activity implements AdapterView.OnItemClickListener{
     ListView l;
-    String list[];
+   // String list[];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("Display","Inside onCreate method");

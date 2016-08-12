@@ -1,8 +1,11 @@
 package com.bignerdranch.android.locationbasedreminders;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,7 +26,7 @@ import java.util.TimeZone;
  * Created by donita on 30-07-2016.
  */
 public  class MyFragment extends Fragment {
-    private TextView textView;
+  //  private TextView textView;
     private  ReminderDbAdapter dbHelper;
     private  ArrayList<ReminderInfo> reminderList = new ArrayList<>();
 
@@ -81,7 +84,9 @@ public  class MyFragment extends Fragment {
     {
         Log.d("Create","in create view");
         View layout=inflater.inflate(R.layout.my_fragment,container,false);
+
         Bundle bundle=getArguments();
+
         if(bundle!=null)
         {
             RecyclerView recyclerView=(RecyclerView) layout.findViewById(R.id.cardList);

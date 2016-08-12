@@ -83,14 +83,14 @@ public class ReminderDbAdapter
         return mCursor;*/
 
     }
-    public Cursor fetchGeneralReminders(){
+   /* public Cursor fetchGeneralReminders(){
         Cursor cursor=mDb.rawQuery("SELECT * FROM " + "Location" + " where status = 'false'",null);
         if (cursor!=null){
           //  cursor.moveToFirst();
             Log.e("notnull","cur not null general"+cursor.moveToFirst());
         }
         return cursor;
-    }
+    }*/
 
     public Cursor fetchSpecificReminders(){
         Cursor cursor=mDb.rawQuery("SELECT * FROM " + "Reminder" + " WHERE status = 'false' and name !=''",null);

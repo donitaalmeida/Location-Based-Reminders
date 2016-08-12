@@ -21,8 +21,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -72,20 +74,19 @@ import java.util.TimeZone;
  * Created by shikh on 7/27/2016.
  */
 public class AddReminder extends ActionBarActivity implements View.OnClickListener,  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
-    ArrayList<PlaceInfo> temp=new ArrayList<>();
+   // ArrayList<PlaceInfo> temp=new ArrayList<>();
     private Button mSaveButton;
     private Button mCancelButton;
-    private TextView mAddressText;
-    private TextView mNameText;
+
     Calendar myCalendar = Calendar.getInstance();
     DatePickerDialog datePicker1;
     private EditText mTitleEditText;
-    public static String startDateString;
+  //  public static String startDateString;
     private EditText mNameEditText;
     private Location mLocation;
     private EditText mAddressEditText;
     private EditText mDateEditText;
-    private String[] contactList;
+  //  private String[] contactList;
     private ImageView contactsText;
 
     private String[] nameNumberArray;
@@ -95,14 +96,14 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     static SharedPreferences sharedPreferences;
     private int counter;
     private Handler updateBarHandler;
-    String[] fromDate;
+
     public static boolean validateDateField = false;
     private ProgressDialog pDialog;
     private double lat,lng;
     private Button mLocationButton;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
     private static final int PERMISSIONS_WRITE_EXTERNAL_STORAGE=105;
-    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 125;
+ //   private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 125;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     private String imageName;
     private Bitmap imageBitmap;
@@ -117,9 +118,9 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
   //  private RadioGroup mRadioGroup;
     private String mDropDownSelectedType;
  //   private GoogleApiClient mGoogleApiClient;
-    private RadioButton mGeneralRadioButton;
-    private RadioButton mSpecificRadioButton;
-    private static final String GOOGLE_API_KEY = "AIzaSyDPCg0_ZB96tWAt5-7EaCsanrrLiLtwpaY";
+  //  private RadioButton mGeneralRadioButton;
+  //  private RadioButton mSpecificRadioButton;
+   // private static final String GOOGLE_API_KEY = "AIzaSyDPCg0_ZB96tWAt5-7EaCsanrrLiLtwpaY";
 
     private Intent serviceIntent;
 
@@ -130,7 +131,10 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
     }
     //--------------------------
     public void startService(View view, boolean power) {
-        serviceIntent = new Intent(getApplicationContext(), LocationService.class);
+        if(serviceIntent==null){
+            serviceIntent = new Intent(getApplicationContext(), LocationService.class);
+            serviceIntent.addCategory("MyServiceTag");
+        }
         if(power){
             serviceIntent.putExtra("powerMode", "yes");
         }
@@ -140,8 +144,10 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
 
 
     public void stopService(View view){
+        serviceIntent = new Intent(getApplicationContext(), LocationService.class);
+        serviceIntent.addCategory("MyServiceTag");
         if(serviceIntent!=null){
-            stopService(new Intent(this,LocationService.class));
+            stopService(serviceIntent);
         }
     }
     //-----------------------------
@@ -173,8 +179,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         sharedPreferences = getSharedPreferences("shared", MODE_PRIVATE);
         displayImage=(ImageView) findViewById(R.id.pasteImage);
-        mAddressText=(TextView)findViewById(R.id.place_address_textview);
-        mNameText=(TextView)findViewById(R.id.place_name_textview);
+
         mLocationButton=(Button)findViewById(R.id.location_button);
         mLocationButton.setOnClickListener(new View.OnClickListener(){
 
@@ -376,7 +381,7 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
             Bundle extras = data.getExtras();
             imageBitmap = (Bitmap) extras.get("data");
             displayImage.setImageBitmap(imageBitmap);
-            imageName="LBR"+new Date().getTime()+".png";
+            imageName="LBR"+ new Date().getTime()+".png";
          /*   if(saveImage(name,imageBitmap)){
                 Toast.makeText(getApplicationContext(), "Image Saved", Toast.LENGTH_SHORT).show();
             }
@@ -403,11 +408,11 @@ public class AddReminder extends ActionBarActivity implements View.OnClickListen
         }
         return success;
     }
-    private Bitmap getImageFromDevice(String imageName){
+  /*  private Bitmap getImageFromDevice(String imageName){
         File f = new File(Environment.getExternalStorageDirectory()+"/"+imageName);
         Bitmap bmp = BitmapFactory.decodeFile(f.getAbsolutePath());
         return bmp;
-    }
+    }*/
 
     private DatePickerDialog.OnDateSetListener fromListener = new DatePickerDialog.OnDateSetListener(){
         public void onDateSet(DatePicker view, int from_year, int from_month,
